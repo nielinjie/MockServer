@@ -1,0 +1,1 @@
+* [RAML for JAXRS](https://github.com/mulesoft/raml-for-jax-rs) - Creating JAXRS java interface and converting JAXRS annotated class into. Also supports Swagger annotations for documenting API. 

@@ -1,0 +1,27 @@
+*.DS_Store
+.DS_Store
+*.log
+*.bak
+.git/
+*.bak*
+
+# Maven
+target/
+.repo
+
+# Eclipse
+bin/
+.project
+.classpath
+.settings
+*/.settings
+
+# Intelli-J
+*.iml
+*.ipl
+.idea/
+
+# Project specific
+resources/
+
+

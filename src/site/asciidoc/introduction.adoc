@@ -1,0 +1,3 @@
+== Introduction
+
+Framework for documenting and mocking REST API based on RAML specification file.

@@ -1,11 +1,15 @@
 package org.uniknow.agiledev.docMockRest;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.Test;
 import org.raml.model.Raml;
+import org.raml.model.Resource;
 
 import javax.validation.ValidationException;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
@@ -45,4 +49,25 @@ public class MockServerTest {
         server.createMockServer(null, 1);
     }
 
+    /**
+     * Verifies ValidationException occurs when collection of stubbed resources is null
+     */
+    @Test(expected = ValidationException.class)
+    public void stubResourcesNull() {
+        MockServer server = new MockServer();
+        WireMockServer mockServer = createMock(WireMockServer.class);
+        replay(mockServer);
+
+        server.stubResources(mockServer, null);
+    }
+
+    /**
+     * Verifies ValidationException occurs when mock server is null
+     */
+    @Test(expected = ValidationException.class)
+    public void stubResourcesMockServerNull() {
+        MockServer server = new MockServer();
+
+        server.stubResources(null, new ArrayList<>());
+    }
 }

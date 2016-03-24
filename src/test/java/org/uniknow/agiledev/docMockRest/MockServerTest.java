@@ -5,6 +5,8 @@ import org.raml.model.Raml;
 
 import javax.validation.ValidationException;
 
+import java.io.FileNotFoundException;
+
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 
@@ -17,7 +19,7 @@ public class MockServerTest {
      * Verifies ValidationException is thrown when specified RAML file is null
      */
     @Test(expected = ValidationException.class)
-    public void testConstructorRamlFileNull() {
+    public void testConstructorRamlFileNull() throws FileNotFoundException {
         new MockServer(null,0);
     }
 

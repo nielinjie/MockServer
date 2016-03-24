@@ -4,7 +4,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -14,6 +17,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import org.raml.model.ActionType;
 import org.raml.model.Raml;
 import org.raml.model.Resource;
+import org.raml.parser.loader.FileResourceLoader;
 import org.raml.parser.visitor.RamlDocumentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +39,15 @@ public class MockServer {
     /**
      * Constructor Mock Server
      *
-     * @param ramlfile File containing RAML definition on which mocks will be based
+     * @param specificationFile Location of file containing RAML definition on which mocks will be based
      * @param port Port on which mock server will be reachable.
+     *
+     * @throws FileNotFoundException if specification file doesn't exist
      */
-    public MockServer(@NotNull String ramlfile, int port) {
-        log.info("Starting MockServer using RAML file: {} on port: {}", ramlfile, port);
+    public MockServer(String specificationFile, int port)  throws FileNotFoundException {
+        log.info("Starting MockServer using RAML file: {} on port: {}", specificationFile, port);
 
-        Raml raml = getSpecification(ramlfile);
+        Raml raml = getSpecification(specificationFile);
 
         createMockServer(raml, port);
     }
@@ -53,10 +59,10 @@ public class MockServer {
         WireMockServer wireMockServer = new WireMockServer(
                 wireMockConfig().port(port));
         wireMockServer.start();
-        wireMockServer.stubFor(get(urlEqualTo("/test"))
+        wireMockServer.stubFor(get(urlEqualTo("/info"))
                 .willReturn(aResponse()
                         .withHeader("Content-Type", "text/plain")
-                        .withBody("Hello world!")));
+                        .withBody("Mocking REST API " + specification.getTitle() + " version " + specification.getVersion())));
 
         final Collection<Resource> resources = specification.getResources().values();
 
@@ -74,28 +80,36 @@ public class MockServer {
     /**
      * Returns REST API specification.
      *
-     * @param ramlFileName Name of RAML file that contains REST API specification
+     * @param specificationFile Location of RAML file that contains REST API specification
      *
      * @return Rest API specification in the form of RAML model.
+     *
+     * @throws FileNotFoundException if specification file could not be found.
      */
-    Raml getSpecification(@NotNull String ramlFileName) {
-        // TODO: Should also be possible to load RAML file from path on system.
-        URL url = getClass().getClassLoader().getResource(ramlFileName);
-        if (url == null) {
-            log.error("File: {} does not exists!", ramlFileName);
+    Raml getSpecification(@NotNull String specificationFile) throws FileNotFoundException{
+        log.debug("Loading specification file '{}'", specificationFile);
+//        // TODO: Should also be possible to load RAML file from path on system.
+//        URL url =  getClass().getClassLoader().getResource(specificationFile);
+//        if (url == null) {
+//            log.error("Specification file {} does not exists!", specificationFile);
+//            throw new FileNotFoundException("Specification file '" + specificationFile + "' could not be found.");
+//        }
+//        log.debug("URL for the specification file: {}", url.toString());
+//
+        File file = new File(specificationFile);
+        if (!file.exists()) {
+            log.error("Specification file {} does not exists!", specificationFile);
+            throw new FileNotFoundException("Specification file '" + specificationFile + "' could not be found.");
+        }
+
+        if (file.isDirectory()) {
+            log.error("{} is a directory!", specificationFile);
             System.exit(1);
         }
-        log.debug("URL for the resource: {}", url.toString());
 
-        if (new File(url.getPath()).isDirectory()) {
-            log.error("{} is a directory!", ramlFileName);
-            System.exit(1);
-        }
-
-        Raml raml = new RamlDocumentBuilder().build(Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(ramlFileName), ramlFileName);
-        log.info("RAML Title: {} version: {}", raml.getTitle(), raml.getVersion());
+        Raml raml = new RamlDocumentBuilder(new FileResourceLoader(file.getParentFile().getAbsolutePath()))
+                .build(new FileInputStream(file),"");
+        log.info("Loaded specifications for REST API '{}' version '{}'", raml.getTitle(), raml.getVersion());
 
         return raml;
     }

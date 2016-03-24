@@ -6,9 +6,18 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
+import java.io.FileNotFoundException;
+
 public class MockServerStandalone {
 
-    public static void main(String[] args) {
+    /**
+     * Method to start standalone Mock Server
+     *
+     * @param args arguments containing the location of the specification file and port number on which mock server need to be accessible.
+     *
+     * @throws FileNotFoundException if specification file could not be found.
+     */
+    public static void main(String[] args) throws FileNotFoundException {
 
         OptionParser parser = new OptionParser("r::");
         OptionSpec<String> ramlfile = parser.acceptsAll(asList("r", "ramlfile"))

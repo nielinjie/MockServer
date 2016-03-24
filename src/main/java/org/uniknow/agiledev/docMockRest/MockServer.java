@@ -17,30 +17,39 @@ import org.raml.model.Resource;
 import org.raml.parser.visitor.RamlDocumentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.uniknow.agiledev.dbc4java.Validated;
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+@Validated
 public class MockServer {
     private final static Logger log = LoggerFactory.getLogger(MockServer.class);
 
-    public MockServer(String ramlfile, int port) {
+    /**
+     * Default constructor for testing purposes only
+     */
+    MockServer() {}
+
+    /**
+     * Constructor Mock Server
+     *
+     * @param ramlfile File containing RAML definition on which mocks will be based
+     * @param port Port on which mock server will be reachable.
+     */
+    public MockServer(@NotNull String ramlfile, int port) {
         log.info("Starting MockServer using RAML file: {} on port: {}", ramlfile, port);
 
-        URL url = getClass().getClassLoader().getResource(ramlfile);
-        if (url == null) {
-            log.error("File: {} does not exists!", ramlfile);
-            System.exit(1);
-        }
-        log.debug("URL for the resource: {}", url.toString());
+        Raml raml = getSpecification(ramlfile);
 
-        if (new File(url.getPath()).isDirectory()) {
-            log.error("{} is a directory!", ramlfile);
-            System.exit(1);
-        }
+        createMockServer(raml, port);
+    }
 
-        Raml raml = new RamlDocumentBuilder().build(Thread.currentThread()
-                .getContextClassLoader()
-                .getResourceAsStream(ramlfile), ramlfile);
-        log.info("RAML Title: {} version: {}", raml.getTitle(), raml.getVersion());
-
+    /**
+     * Creates server mocking REST APIs which are specified within RAML model
+     */
+    void createMockServer(@NotNull Raml specification, @Min(0) int port) {
         WireMockServer wireMockServer = new WireMockServer(
                 wireMockConfig().port(port));
         wireMockServer.start();
@@ -49,7 +58,7 @@ public class MockServer {
                         .withHeader("Content-Type", "text/plain")
                         .withBody("Hello world!")));
 
-        final Collection<Resource> resources = raml.getResources().values();
+        final Collection<Resource> resources = specification.getResources().values();
 
         stubResourcesRecursive(wireMockServer, resources);
 
@@ -60,6 +69,35 @@ public class MockServer {
                 wireMockServer.shutdown();
             }
         });
+    }
+
+    /**
+     * Returns REST API specification.
+     *
+     * @param ramlFileName Name of RAML file that contains REST API specification
+     *
+     * @return Rest API specification in the form of RAML model.
+     */
+    Raml getSpecification(@NotNull String ramlFileName) {
+        // TODO: Should also be possible to load RAML file from path on system.
+        URL url = getClass().getClassLoader().getResource(ramlFileName);
+        if (url == null) {
+            log.error("File: {} does not exists!", ramlFileName);
+            System.exit(1);
+        }
+        log.debug("URL for the resource: {}", url.toString());
+
+        if (new File(url.getPath()).isDirectory()) {
+            log.error("{} is a directory!", ramlFileName);
+            System.exit(1);
+        }
+
+        Raml raml = new RamlDocumentBuilder().build(Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream(ramlFileName), ramlFileName);
+        log.info("RAML Title: {} version: {}", raml.getTitle(), raml.getVersion());
+
+        return raml;
     }
 
     private void stubResourcesRecursive(WireMockServer wireMockServer, Collection<Resource> resources) {

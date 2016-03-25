@@ -24,7 +24,7 @@ public class MockServerTest {
      */
     @Test(expected = ValidationException.class)
     public void testConstructorRamlFileNull() throws FileNotFoundException {
-        new MockServer(null,0);
+        new MockServer(null,0, "test");
     }
 
     /**
@@ -36,7 +36,7 @@ public class MockServerTest {
         Raml model = createMock(Raml.class);
         replay(model);
 
-        server.createMockServer(model, -1);
+        server.createMockServer(model, -1,"test");
     }
 
     /**
@@ -46,7 +46,7 @@ public class MockServerTest {
     public void testCreateMockServerSpecificationNull() {
         MockServer server = new MockServer();
 
-        server.createMockServer(null, 1);
+        server.createMockServer(null, 1,"test");
     }
 
     /**

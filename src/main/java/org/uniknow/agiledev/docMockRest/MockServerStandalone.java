@@ -26,9 +26,13 @@ public class MockServerStandalone {
         OptionSpec<Integer> port = parser.acceptsAll(asList("p", "port"))
                 .withRequiredArg().required()
                 .ofType(Integer.class);
+        OptionSpec<String> responseFiles = parser.acceptsAll(asList("responses"))
+                .withRequiredArg().required()
+                .ofType(String.class);
+
 
         OptionSet options = parser.parse(args);
 
-        new MockServer(ramlfile.value(options), port.value(options));
+        new MockServer(ramlfile.value(options), port.value(options), responseFiles.value(options));
     }
 }

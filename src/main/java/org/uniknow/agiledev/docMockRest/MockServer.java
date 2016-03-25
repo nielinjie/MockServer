@@ -42,22 +42,23 @@ public class MockServer {
      *
      * @param specificationFile Location of file containing RAML definition on which mocks will be based
      * @param port              Port on which mock server will be reachable.
+     * @param responseFiles Location of files containing responses for mocked resources
      * @throws FileNotFoundException if specification file doesn't exist
      */
-    public MockServer(String specificationFile, int port) throws FileNotFoundException {
+    public MockServer(String specificationFile, int port, String responseFiles) throws FileNotFoundException {
         log.info("Starting MockServer using RAML file: {} on port: {}", specificationFile, port);
 
         Raml raml = getSpecification(specificationFile);
 
-        createMockServer(raml, port);
+        createMockServer(raml, port, responseFiles);
     }
 
     /**
      * Creates server mocking REST APIs which are specified within RAML model
      */
-    void createMockServer(@NotNull Raml specification, @Min(0) int port) {
+    void createMockServer(@NotNull Raml specification, @Min(0) int port, String responseFiles) {
         WireMockServer wireMockServer = new WireMockServer(
-                wireMockConfig().port(port));
+                wireMockConfig().port(port).withRootDirectory(responseFiles));
         wireMockServer.start();
 
         // Create stub returning info regarding mocked interfaces.
@@ -65,6 +66,13 @@ public class MockServer {
                 .willReturn(aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
                         .withBody("Mocking REST API " + specification.getTitle() + " version " + specification.getVersion())));
+
+        // MASE: Temporary stub to check whether returning response defined in file is working
+        // TODO: Use transformer by which we first check whether there is response within responseFiles, then check whether there was a default response defined (by example) and otherwise return 405.
+        wireMockServer.stubFor(get(urlEqualTo("/test"))
+                .willReturn(aResponse()
+                        .withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
+                        .withBodyFile("test/helloWorld.resp")));
 
         final Collection<Resource> resources = specification.getResources().values();
 

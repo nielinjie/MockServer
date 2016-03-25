@@ -115,7 +115,7 @@ public class MockServer {
      */
     final void stubResources(@NotNull WireMockServer wireMockServer, @NotNull Collection<Resource> resources) {
         for (Resource resource : resources) {
-            log.info("Relative uri:{}", resource.getRelativeUri());
+            log.info("stub {}", resource.getUri());
 
             if (hasAJsonBodyExample(resource)) {
                 stubJsonBodyExample(wireMockServer, resource);
@@ -144,7 +144,7 @@ public class MockServer {
     private void stubJsonBodyExampleWithCode(WireMockServer wireMockServer, Resource resource, String statusCode,
                                              ActionType actionType) {
         String resourceMatch = replaceResourceIdWithAnyMatcher(resource);
-        log.debug("stubJsonBodyExampleWithCode: {}  status code: {} resourceMatch: {}",
+        log.debug("stub {},  status code: {} resourceMatch: {}",
                 resource.getUri(),
                 statusCode,
                 resourceMatch);
@@ -183,9 +183,10 @@ public class MockServer {
 
     // TODO: now only get on resource without responses for status codes in RAML
     private void stubJsonBodyExample(WireMockServer wireMockServer, Resource resource) {
-        String resourceMatch = replaceResourceIdWithAnyMatcher(resource);
-        log.debug("stubJsonBodyExample:{} resourceMatch: {}:", resource.getUri(), resourceMatch);
+//        String resourceMatch = replaceResourceIdWithAnyMatcher(resource);
+//        log.debug("stubJsonBodyExample:{} resourceMatch: {}:", resource.getUri(), resourceMatch);
 
+        log.debug("stub [GET]" + resource.getUri());
         wireMockServer.stubFor(
                 get(urlEqualTo(resource.getUri()))
                         .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
@@ -197,6 +198,12 @@ public class MockServer {
                                         .getExample())));
     }
 
+    /**
+     * Replaces {id} within URI of resource by id
+     *
+     * @param resource
+     * @return
+     */
     private String replaceResourceIdWithAnyMatcher(Resource resource) {
         return resource.getUri().replaceAll("\\{[0-9a-zA-Z]*\\}", "[0-9a-zA-Z.]*");
     }

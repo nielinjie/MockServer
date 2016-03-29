@@ -1,0 +1,14 @@
+<h2>HTTP status code <a href="http://httpstatus.es/{{@key}}" target="_blank">{{@key}}</a></h2>
+{{md this.description}}
+
+{{#with this.headers}}
+    {{> header_list}}
+{{/with}}
+
+{{#unless this.body.empty}}
+  <h3>Body</h3>
+    {{#each this.body}}
+      {{> body}}
+      <hr/>
+    {{/each}}
+{{/unless}}

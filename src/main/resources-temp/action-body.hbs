@@ -1,0 +1,58 @@
+<!-- Nav tabs -->
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a href="#{{toUniqueID ../uri}}_{{lower type}}_request" data-toggle="tab">Request</a>
+    </li>
+    {{#unless responses.empty}}
+        <li>
+            <a href="#{{toUniqueID ../uri}}_{{lower type}}_response" data-toggle="tab">Response</a>
+        </li>
+    {{/unless}}
+</ul>
+
+<!-- Tab panes -->
+<div class="tab-content">
+    <div class="tab-pane active" id="{{toUniqueID ../uri}}_{{lower type}}_request">
+        {{#unless uriParameters.empty}}
+            <h3>URI Parameters</h3>
+            <ul>
+                {{#each uriParameters}}
+                  {{> namedParam}}
+                {{/each}}
+            </ul>
+        {{/unless}}
+
+        {{#unless headers.empty}}
+            <h3>Headers</h3>
+            <ul>
+                {{#each headers}}
+                  {{> namedParam}}
+                {{/each}}
+            </ul>
+        {{/unless}}
+
+        {{#unless queryParameters.empty}}
+            <h3>Query Parameters</h3>
+            <ul>
+                {{#each queryParameters}}
+                  {{> namedParam}}
+                {{/each}}
+            </ul>
+        {{/unless}}
+
+        {{#unless body.empty}}
+            <h3>Body</h3>
+            {{#each body}}
+                {{> body }}
+            {{/each}}
+        {{/unless}}
+    </div>
+
+    {{#unless responses.empty}}
+        <div class="tab-pane" id="{{toUniqueID ../uri}}_{{lower type}}_response">
+            {{#each responses}}
+                {{> response}}
+            {{/each}}
+        </div>
+    {{/unless}}
+</div>

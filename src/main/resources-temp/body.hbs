@@ -1,0 +1,57 @@
+<div class="body-type">
+    <strong class="body-label">Type:</strong> <code id="key">{{@key}}</code>
+</div>
+{{#if formParameters}}
+<div class="body-form-parameters">
+  <strong class="body-label">Form Parameters:</strong>
+  <ul>
+    {{#each formParameters}}
+        <li>
+            <strong>{{@key}}</strong>
+            {{#each this}}
+                        <em>
+                          {{#if this.required}}
+                              required
+                          {{/if}}
+                          {{#if this.type}}
+                              ({{lower this.type}})
+                          {{/if}}
+                          {{#if this.enumeration}}
+                              one of {{this.enumeration}}
+                          {{/if}}
+                        </em>
+                      {{md description}}
+                      {{#if this.schema}}
+                          <p>
+                              <small>
+                                  <strong>Schema:</strong>
+                                  <code>{{this.schema}}</code>
+                              </small>
+                          </p>
+                      {{/if}}
+                      {{#if this.example}}
+                          <p>
+                              <small>
+                                  <strong>Example:</strong>
+                                  <code>{{this.example}}</code>
+                              </small>
+                          </p>
+                      {{/if}}
+                    </li>
+            {{/each}}
+    {{/each}}
+  </ul>
+</div>
+{{/if}}
+{{#if this.schema}}
+<div class="body-schema">
+    <strong class="body-label">Schema:</strong>
+   {{preOrLink this.schema}}
+</div>
+{{/if}}
+{{#if this.example}}
+<div class="body-example">
+    <strong class="body-label">Example:</strong>
+    <pre><code class="json">{{highlight this.example}}</code></pre>
+</div>
+{{/if}}

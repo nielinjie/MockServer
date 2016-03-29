@@ -26,6 +26,7 @@ import org.uniknow.agiledev.dbc4java.Validated;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.MediaType;
 
 @Validated
 public class MockServer {
@@ -58,13 +59,13 @@ public class MockServer {
      */
     void createMockServer(@NotNull Raml specification, @Min(0) int port, String responseFiles) {
         WireMockServer wireMockServer = new WireMockServer(
-                wireMockConfig().port(port).withRootDirectory(responseFiles));
+                wireMockConfig().port(port).withRootDirectory(responseFiles).extensions(new MockResponses(responseFiles)));
         wireMockServer.start();
 
         // Create stub returning info regarding mocked interfaces.
         wireMockServer.stubFor(get(urlEqualTo("/info"))
                 .willReturn(aResponse()
-                        .withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
                         .withBody("Mocking REST API " + specification.getTitle() + " version " + specification.getVersion())));
 
         // MASE: Temporary stub to check whether returning response defined in file is working
@@ -72,7 +73,7 @@ public class MockServer {
         wireMockServer.stubFor(get(urlEqualTo("/test"))
                 .willReturn(aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
-                        .withBodyFile("test/helloWorld.resp")));
+                        .withBody("Default test response")));
 
         final Collection<Resource> resources = specification.getResources().values();
 

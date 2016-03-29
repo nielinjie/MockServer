@@ -112,7 +112,6 @@ public class MockResponses extends ResponseTransformer {
 
         if (responseDefinition.getBody() != null) {
             // Return (default) response as defined within RAML file
-            System.out.println("Return default response " + responseDefinition);
             return ResponseDefinitionBuilder
                     .like(responseDefinition)
                     .build();

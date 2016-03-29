@@ -74,6 +74,20 @@
         </dependency>
         <!-- End: Design by Contract dependencies-->
 
+        <!-- Start: Dependencies RAML2HTML converter -->
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>4.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars-markdown</artifactId>
+            <version>4.0.5</version>
+        </dependency>
+        <!-- End: Dependencies RAML2HTML converter -->
+
+
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>

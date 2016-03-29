@@ -4,5 +4,5 @@ Framework for documenting and mocking REST API based on RAML specification file.
 
 To instantiate a Mock Server execute the following command:
 
-    java -jar DocMockRest-<version>-full.jar -r <RAML file> -p <Port Number>
+    java -jar DocMockRest-<version>-full.jar -r <RAML file> -p <Port Number> -responses <location response files>
 

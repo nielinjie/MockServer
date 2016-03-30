@@ -12,8 +12,8 @@ The DocMockRest tool requires Java 1.8 and if you are planning to build the syst
 
 ##### Building system
 
-. Get the source code from [BitBucket](https://bitbucket.org/uniknow/docmockrest)
-. Build complete jar by executing `mvn clean install`. The result will be `DocMockRest-<version>-full.jar` within the target directory. 
+1 Get the source code from [BitBucket](https://bitbucket.org/uniknow/docmockrest)
+2 Build complete jar by executing `mvn clean install`. The result will be `DocMockRest-<version>-full.jar` within the target directory. 
 
 ##### Running system
 

@@ -1,5 +1,7 @@
 package org.uniknow.agiledev.docMockRest;
 
+import org.everit.json.schema.Schema;
+import org.everit.json.schema.loader.SchemaLoader;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
@@ -8,7 +10,14 @@ import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.raml.model.Action;
+import org.raml.model.Raml;
+import org.raml.model.Resource;
+import org.uniknow.agiledev.dbc4java.Validated;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
@@ -20,16 +29,21 @@ import java.nio.file.*;
 /**
  * Checks whether response for request is defined and it not returns default response.
  */
+@Validated
 public class MockResponses extends ResponseTransformer {
 
     private final String pathResponseFiles;
+
+    @NotNull
+    private final Raml specification;
 
     /**
      * Constructor
      *
      * @param responseFiles - Path to directory in which response files are defined.
      */
-    public MockResponses(String responseFiles) {
+    public MockResponses(Raml specification, String responseFiles) {
+        this.specification = specification;
         pathResponseFiles = responseFiles;
     }
 
@@ -94,6 +108,7 @@ public class MockResponses extends ResponseTransformer {
                     while((line = reader.readLine()) != null) {
                         response.append(line);
                     }
+
                     return ResponseDefinitionBuilder
                             .like(responseDefinition).but()
                             .withBody(response.toString())
@@ -122,6 +137,35 @@ public class MockResponses extends ResponseTransformer {
                     .withBody("No mocked response found for " + request.getUrl())
                     .build();
         }
+    }
+
+    /**
+     * Validates response that will be returned
+     *
+     * TODO
+     *
+     * @param response String containing response
+     * @return true if response valid; false otherwise
+     */
+    private boolean validateResponse(String response) {
+
+        // If JSON response and JSON schema defined verify response
+//        if (responseExtenstion == "json") {
+//            // Get resource at which response applies
+//            Resource resource = specification.getResource(request.getUrl());
+//            if (resource != null) {
+//                // Get schema that should be applied (Issue: how to determine response code)
+//                Action action = resource.getAction(request.getMethod().value());
+//                String schema = action.getResponses().get("response code").getBody().get(request.contentTypeHeader().firstValue()).getSchema();
+//                JSONObject rawSchema = new JSONObject(new JSONTokener(schema));
+//                Schema jsonSchema = SchemaLoader.load(rawSchema);
+//
+//                jsonSchema.validate(new JSONObject(response));
+//            } else {
+//                System.out.println("Resource for request " + request.getUrl() + " could not be found?");
+//            }
+//        }
+        return true;
     }
 
     @Override

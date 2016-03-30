@@ -69,7 +69,8 @@ public class MockServer {
      */
     void createMockServer(@NotNull Raml specification, @Min(0) int port, String responseFiles) {
         WireMockServer wireMockServer = new WireMockServer(
-                wireMockConfig().port(port).withRootDirectory(responseFiles).extensions(new MockResponses(responseFiles)));
+                wireMockConfig().port(port).withRootDirectory(responseFiles).extensions(
+                        new MockResponses(specification, responseFiles)));
         wireMockServer.start();
 
         // Create stub returning info regarding mocked interfaces.

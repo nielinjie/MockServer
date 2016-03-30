@@ -8,8 +8,8 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <description>
-		Proof of Concept using RAML for documenting and mocking REST API    
-	</description>
+        Proof of Concept using RAML for documenting and mocking REST API
+    </description>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -87,17 +87,25 @@
         </dependency>
         <!-- End: Dependencies RAML2HTML converter -->
 
-
+        <!-- Dependency for mocking API responses -->
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
             <version>1.58</version>
         </dependency>
 
+        <!-- Dependency for RAML -->
         <dependency>
-            <groupId>org.raml</groupId>
-            <artifactId>raml-parser</artifactId>
-            <version>0.8.13</version>
+        <groupId>org.raml</groupId>
+        <artifactId>raml-parser</artifactId>
+        <version>0.8.13</version>
+        </dependency>
+
+        <!-- Dependency for JSON Schema validation -->
+        <dependency>
+            <groupId>org.everit.json</groupId>
+            <artifactId>org.everit.json.schema</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
         <dependency>
@@ -106,6 +114,7 @@
             <version>3.0.1</version>
         </dependency>
 
+        <!-- Dependency for easily parsing java arguments -->
         <dependency>
             <groupId>net.sf.jopt-simple</groupId>
             <artifactId>jopt-simple</artifactId>

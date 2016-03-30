@@ -6,3 +6,5 @@ To instantiate a Mock Server execute the following command:
 
     java -jar DocMockRest-<version>-full.jar -r <RAML file> -p <Port Number> -responses <location response files>
 
+Documentation which is generated based on the included RAML file can be found at `localhost:<port number>/info`.
+

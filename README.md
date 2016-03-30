@@ -10,12 +10,12 @@ DocMockRest is a simple standalone server to mock RESTful API services specified
 
 The DocMockRest tool requires Java 1.8 and if you are planning to build the system you also need Maven 3.
 
-##### Building system
+#### Building system
 
-. Get the source code from [BitBucket](https://bitbucket.org/uniknow/docmockrest)
-. Build complete jar by executing `mvn clean install`. The result will be `DocMockRest-<version>-full.jar` within the target directory. 
+1.  Get the source code from [BitBucket](https://bitbucket.org/uniknow/docmockrest)
+1.  Build complete jar by executing `mvn clean install`. The result will be `DocMockRest-<version>-full.jar` within the target directory. 
 
-##### Running system
+#### Running system
 
 The system can be started by executing the following instruction within the directory where the `DocMockRest-<version>-full.jar` exist:
  

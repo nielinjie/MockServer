@@ -101,17 +101,18 @@ public class MockResponses extends ResponseTransformer {
             if (Files.exists(pathResponseFile)) {
                 System.out.println("Response defined for " + request.getUrl() + " : " + pathResponseFile);
                 try {
-                    StringBuffer response = new StringBuffer();
+                    //StringBuffer response = new StringBuffer();
                     InputStream in = Files.newInputStream(pathResponseFile);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                    String line = null;
-                    while((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
+                    String response = IoUtil.convertStreamToString(in);
+//                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+//                    String line = null;
+//                    while((line = reader.readLine()) != null) {
+//                        response.append(line);
+//                    }
 
                     return ResponseDefinitionBuilder
                             .like(responseDefinition).but()
-                            .withBody(response.toString())
+                            .withBody(response)
                             .build();
 
                 } catch(IOException error) {

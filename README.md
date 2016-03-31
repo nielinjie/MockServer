@@ -8,7 +8,7 @@ DocMockRest is a simple standalone server to mock RESTful API services specified
 
 #### Prerequisites
 
-The DocMockRest tool requires Java 1.8 and if you are planning to build the system you also need Maven 3.
+The DocMockRest tool requires Java 1.8 and if you are planning to build the system you also need Maven 3.3 or above.
 
 #### Building system
 

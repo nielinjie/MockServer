@@ -37,7 +37,7 @@
 
         <!-- Properties for site documentation -->
         <scm-publish.scmBranch>master</scm-publish.scmBranch>
-        <scm-publish.pubScmUrl>scm:git:https://uniknow@bitbucket.org/uniknow/uniknow.bitbucket.org.git</scm-publish.pubScmUrl>
+        <scm-publish.pubScmUrl>scm:git:https://bitbucket.org/uniknow/uniknow.bitbucket.org.git</scm-publish.pubScmUrl>
         <siteOutputDirectory>${project.build.directory}/site/${project.artifactId}</siteOutputDirectory>
         <scm-publish.siteDocOuputDirectory>${project.build.directory}/site</scm-publish.siteDocOuputDirectory>
 

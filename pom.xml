@@ -6,10 +6,19 @@
     <groupId>org.uniknow.agiledev</groupId>
     <artifactId>DocMockRest</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-
+    <name>DocMockRest</name>
     <description>
-		Proof of Concept using RAML for documenting and mocking REST API    
-	</description>
+        Proof of Concept using RAML for documenting and mocking REST API
+    </description>
+
+    <scm>
+        <connection>scm:git:ssh://bitbucket.org:uniknow/docmockrest.git</connection>
+
+        <url>https://bitbucket.org/uniknow/docmockrest.git</url>
+        <developerConnection>scm:git:ssh://bitbucket.org:uniknow/docmockrest.git
+        </developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -26,6 +35,11 @@
         <inceptionYear>2016</inceptionYear>
         <organizationName>UniKnow</organizationName>
 
+        <!-- Properties for site documentation -->
+        <scm-publish.scmBranch>master</scm-publish.scmBranch>
+        <scm-publish.pubScmUrl>scm:git:https://uniknow@bitbucket.org/uniknow/uniknow.bitbucket.org.git</scm-publish.pubScmUrl>
+        <siteOutputDirectory>${project.build.directory}/site/${project.artifactId}</siteOutputDirectory>
+        <scm-publish.siteDocOuputDirectory>${project.build.directory}/site</scm-publish.siteDocOuputDirectory>
 
         <!-- Version information dependencies -->
         <asciidoctor.diagram>1.2.1</asciidoctor.diagram>
@@ -41,6 +55,22 @@
     </properties>
 
     <dependencies>
+        <!-- Start: Dependencies documentation -->
+        <dependency>
+            <groupId>rubygems</groupId>
+            <artifactId>asciidoctor-diagram</artifactId>
+            <version>${asciidoctor.diagram}</version>
+            <type>gem</type>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>rubygems</groupId>
+                    <artifactId>asciidoctor</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- End: Dependencies documentation -->
+
         <!-- Start: Test Dependencies -->
         <dependency>
             <groupId>junit</groupId>
@@ -74,16 +104,38 @@
         </dependency>
         <!-- End: Design by Contract dependencies-->
 
+        <!-- Start: Dependencies RAML2HTML converter -->
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars</artifactId>
+            <version>4.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jknack</groupId>
+            <artifactId>handlebars-markdown</artifactId>
+            <version>4.0.5</version>
+        </dependency>
+        <!-- End: Dependencies RAML2HTML converter -->
+
+        <!-- Dependency for mocking API responses -->
         <dependency>
             <groupId>com.github.tomakehurst</groupId>
             <artifactId>wiremock</artifactId>
             <version>1.58</version>
         </dependency>
 
+        <!-- Dependency for RAML -->
         <dependency>
-            <groupId>org.raml</groupId>
-            <artifactId>raml-parser</artifactId>
-            <version>0.8.13</version>
+        <groupId>org.raml</groupId>
+        <artifactId>raml-parser</artifactId>
+        <version>0.8.13</version>
+        </dependency>
+
+        <!-- Dependency for JSON Schema validation -->
+        <dependency>
+            <groupId>org.everit.json</groupId>
+            <artifactId>org.everit.json.schema</artifactId>
+            <version>1.2.0</version>
         </dependency>
 
         <dependency>
@@ -92,10 +144,17 @@
             <version>3.0.1</version>
         </dependency>
 
+        <!-- Dependency for easily parsing java arguments -->
         <dependency>
             <groupId>net.sf.jopt-simple</groupId>
             <artifactId>jopt-simple</artifactId>
             <version>4.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.0.1</version>
         </dependency>
 
     </dependencies>
@@ -183,12 +242,35 @@
                 </executions>
             </plugin>
 
+            <!-- START: plugins site documentation -->
+            <plugin>
+                <groupId>de.saumya.mojo</groupId>
+                <artifactId>gem-maven-plugin</artifactId>
+                <version>1.0.10</version>
+                <configuration>
+                    <!-- align JRuby version with AsciidoctorJ to avoid redundant downloading -->
+                    <jrubyVersion>1.7.9</jrubyVersion>
+                    <gemHome>${project.build.directory}/gems</gemHome>
+                    <gemPath>${project.build.directory}/gems</gemPath>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>initialize</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.4</version>
                 <configuration>
+                    <outputDirectory>${siteOutputDirectory}</outputDirectory>
                     <asciidoc>
                         <attributes>
+                            <project-name>${name}</project-name>
                             <imagesdir>${project.basedir}/src/site/resources/images</imagesdir>
                         </attributes>
                     </asciidoc>
@@ -217,6 +299,39 @@
                 </dependencies>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-publish-plugin</artifactId>
+                <version>1.0</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
+                    <checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</checkinComment>
+
+                    <!-- Plugins defaults to "target/staging" and since the distributionManagement section is a pain in the ass for site docs, this is easier -->
+                    <content>${scm-publish.siteDocOuputDirectory}</content>
+                    <skipDeletedFiles>true</skipDeletedFiles>
+                    <pubScmUrl>${scm-publish.pubScmUrl}</pubScmUrl>
+                    <scmBranch>${scm-publish.scmBranch}</scmBranch>
+
+                </configuration>
+            </plugin>
+            <!-- END: plugins site documentation -->
         </plugins>
     </build>
+
+    <repositories>
+        <repository>
+            <id>rubygems-proxy-releases</id>
+            <name>RubyGems.org Proxy (Releases)</name>
+            <url>http://rubygems-proxy.torquebox.org/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
 </project>

@@ -3,9 +3,7 @@ package org.uniknow.agiledev.docMockRest;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +24,7 @@ import org.uniknow.agiledev.dbc4java.Validated;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.core.MediaType;
 
 @Validated
 public class MockServer {
@@ -54,25 +53,38 @@ public class MockServer {
     }
 
     /**
+     * Generates HTML documentation for specified RAML file.
+     *
+     * @param specification RAML specification that will be converted into HTML file
+     *
+     * @return
+     */
+    private String generateHtml(Raml specification) {
+        String ramlHtml = new Raml2HtmlRenderer(specification).renderFull();
+        return ramlHtml;
+    }
+
+    /**
      * Creates server mocking REST APIs which are specified within RAML model
      */
     void createMockServer(@NotNull Raml specification, @Min(0) int port, String responseFiles) {
         WireMockServer wireMockServer = new WireMockServer(
-                wireMockConfig().port(port).withRootDirectory(responseFiles));
+                wireMockConfig().port(port).withRootDirectory(responseFiles).extensions(
+                        new MockResponses(specification, responseFiles)));
         wireMockServer.start();
 
         // Create stub returning info regarding mocked interfaces.
         wireMockServer.stubFor(get(urlEqualTo("/info"))
                 .willReturn(aResponse()
-                        .withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
-                        .withBody("Mocking REST API " + specification.getTitle() + " version " + specification.getVersion())));
+                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML)
+                        .withBody(new Raml2HtmlRenderer(specification).renderFull())));
 
         // MASE: Temporary stub to check whether returning response defined in file is working
         // TODO: Use transformer by which we first check whether there is response within responseFiles, then check whether there was a default response defined (by example) and otherwise return 405.
         wireMockServer.stubFor(get(urlEqualTo("/test"))
                 .willReturn(aResponse()
                         .withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
-                        .withBodyFile("test/helloWorld.resp")));
+                        .withBody("Default test response")));
 
         final Collection<Resource> resources = specification.getResources().values();
 
@@ -152,10 +164,10 @@ public class MockServer {
     private void stubJsonBodyExampleWithCode(WireMockServer wireMockServer, Resource resource, String statusCode,
                                              ActionType actionType) {
         String resourceMatch = replaceResourceIdWithAnyMatcher(resource);
-        log.debug("stub {},  status code: {} resourceMatch: {}",
-                resource.getUri(),
-                statusCode,
-                resourceMatch);
+//        log.debug("stub {},  status code: {} resourceMatch: {}",
+//                resource.getUri(),
+//                statusCode,
+//                resourceMatch);
 
         // TODO: Requires that content-type header is set, should check whether that can be defined in RAML file (mediaTypeExtension).
         MappingBuilder urlMatcher;

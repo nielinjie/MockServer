@@ -1,0 +1,4 @@
+== Contributor guidelines
+
+If you want us to help with a code contribution `{project-name}` uses https://maven.apache.org/download.cgi?Preferred=ftp://mirror.reverse.net/pub/apache/[Maven 3.3] and http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html[Java 1.8]. If you don't feel ready to make code contribution yet, no problem! You can also check out the documentation issues [TODO: Include link to issues tagged with docs] or the design issues that we have [TODO: include link to issues tagged with design issues].
+

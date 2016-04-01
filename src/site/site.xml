@@ -20,6 +20,10 @@
             <item href="introduction.html" name="Introduction" />
         </menu>
 
+        <menu name="Guidelines">
+            <item href="contributor-guideline.html" name="Contributor" />
+        </menu>
+
         <menu ref="reports"/>
     </body>
 

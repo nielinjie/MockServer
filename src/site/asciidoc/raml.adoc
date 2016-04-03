@@ -1,4 +1,4 @@
-#RAML
+# RAML
 
 RAML (RESTful API Modeling Language) provides a structured, unambiguous format for describing a RESTful API. It allows you to describe your API; the endpoints, the HTTP methods to be used for each one, any parameters and their format, what you can expect of a response and more.
 
@@ -52,10 +52,10 @@ You can also incorporate additional documentation – or pages – into your RAM
     documentation
 	    - title: Home
 		    content:
-			    This example documentation is part of a [DocMockRest]({site.url})
+			    This example documentation is part of a [DocMockRest](http://uniknow.bitbucket.org/DocMockRest/)
 			    RAML documentation.
 
-NOTE: Notice how you can include Markdown in your meta-information.
+TIP: Notice how you can include Markdown in your meta-information.
 
 There are some other things you can include here, such as how security is implemented, as well as defining traits. We’ll look at these concepts a little later.
 

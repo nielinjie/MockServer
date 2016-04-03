@@ -4,13 +4,13 @@
 
 This README document the steps which are necessary to get DocMockRest up and running.
 
-[DocMockRest](http://uniknow.bitbucket.org/docMockRest/) is a simple standalone server to mock RESTful API services specified by a RAML specification file. This system allows you to quickly define a REST API and have them return JSON, XML or any other type of response.
+[DocMockRest](http://uniknow.bitbucket.org/DocMockRest/) is a simple standalone server to mock RESTful API services specified by a RAML specification file. This system allows you to quickly define a REST API and have them return JSON, XML or any other type of response.
 
 ### How do I get it running? ###
 
 #### Prerequisites
 
-The [DocMockRest](http://uniknow.bitbucket.org/docMockRest/) tool requires Java 1.8 and if you are planning to build the system you also need Maven 3.3 or above.
+The [DocMockRest](http://uniknow.bitbucket.org/DocMockRest/) tool requires Java 1.8 and if you are planning to build the system you also need Maven 3.3 or above.
 
 #### Building system
 

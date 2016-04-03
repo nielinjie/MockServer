@@ -36,7 +36,7 @@
         <organizationName>UniKnow</organizationName>
 
         <!-- Properties for site documentation -->
-        <site.url>http://uniknow.bitbucket.org/docMockRest/</site.url>
+        <site.url>http://uniknow.bitbucket.org/DocMockRest/</site.url>
         <scm-publish.scmBranch>master</scm-publish.scmBranch>
         <scm-publish.pubScmUrl>scm:git:https://bitbucket.org/uniknow/uniknow.bitbucket.org.git</scm-publish.pubScmUrl>
         <siteOutputDirectory>${project.build.directory}/site/${project.artifactId}</siteOutputDirectory>

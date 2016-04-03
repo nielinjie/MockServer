@@ -18,6 +18,7 @@
 
         <menu name="Documentation">
             <item href="introduction.html" name="Introduction" />
+            <item href="raml.html" name="RAML" />
         </menu>
 
         <menu name="Guidelines">

@@ -1,0 +1,67 @@
+#RAML
+
+RAML (RESTful API Modeling Language) provides a structured, unambiguous format for describing a RESTful API. It allows you to describe your API; the endpoints, the HTTP methods to be used for each one, any parameters and their format, what you can expect of a response and more.
+
+You can use RAML in a number of ways:
+
+* It can be used in the design and specification stage to describe the API you plan to build
+* You can use RAML to generate documentation
+* RAML can be used to implement interactive API consoles
+* You can test against RAML
+* It be used to generate mock API responses
+
+In this chapter the focus will be on mocking API responses.
+
+## Writing RAML
+
+The first thing to note is that RAML is a derivative of http://www.yaml.org/[YAML]. You’ll find it easier to work with RAML if you’ve written YAML before, but if you haven’t then it’s relatively straightforward, or you can read this http://www.sitepoint.com/using-yaml-in-php-projects/[tutorial]. Because they’re simply text files, you can use any text editor or IDE to create and edit them.
+
+A RAML file starts with a declaration, indicating the format:
+
+    #%RAML 0.8
+
+Typically you’d then provide some meta-information about your API, for example:
+
+    title: My Example API
+    version: v1
+
+`title` is a required field, `version` is optional.
+
+You should then provide the Base URI for your API. At its simplest, it can be in the following format:
+
+    baseUri: http://example.uniknow.org/
+
+You can also use URI parameters. For example it’s common practice to incorporate a version identifier into API URLs; if you’re taking that approach with yours, you can do this:
+
+    baseUri: http://api.acme.com/{version}/
+
+We’ll look at URI parameters in more detail later on, since they become vital when describing resources.
+
+You can also indicate whether your API is available over HTTPS by setting the protocols field, for example:
+
+    protocols: [ HTTP, HTTPS ]
+
+You can specify the default media type which your API will return, for example:
+
+    mediaType: application/json
+
+Later when we look at responses, we’ll look at how you can describe multiple response media types, and what to expect from them.
+
+You can also incorporate additional documentation – or pages – into your RAML file. For example:
+
+    documentation
+	    - title: Home
+		    content:
+			    This example documentation is part of a [DocMockRest]({site.url})
+			    RAML documentation.
+
+NOTE: Notice how you can include Markdown in your meta-information.
+
+There are some other things you can include here, such as how security is implemented, as well as defining traits. We’ll look at these concepts a little later.
+
+That’s much of the basic information covered, so now let’s move onto resources.
+
+### Describing Resources
+
+TODO
+

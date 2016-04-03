@@ -36,6 +36,7 @@
         <organizationName>UniKnow</organizationName>
 
         <!-- Properties for site documentation -->
+        <site.url>http://uniknow.bitbucket.org/docMockRest/</site.url>
         <scm-publish.scmBranch>master</scm-publish.scmBranch>
         <scm-publish.pubScmUrl>scm:git:https://bitbucket.org/uniknow/uniknow.bitbucket.org.git</scm-publish.pubScmUrl>
         <siteOutputDirectory>${project.build.directory}/site/${project.artifactId}</siteOutputDirectory>
@@ -270,6 +271,7 @@
                     <outputDirectory>${siteOutputDirectory}</outputDirectory>
                     <asciidoc>
                         <attributes>
+                            <site-url>${site.url}</site-url>
                             <project-name>${project.name}</project-name>
                             <imagesdir>${project.basedir}/src/site/resources/images</imagesdir>
                         </attributes>

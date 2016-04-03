@@ -270,7 +270,7 @@
                     <outputDirectory>${siteOutputDirectory}</outputDirectory>
                     <asciidoc>
                         <attributes>
-                            <project-name>${name}</project-name>
+                            <project-name>${project.name}</project-name>
                             <imagesdir>${project.basedir}/src/site/resources/images</imagesdir>
                         </attributes>
                     </asciidoc>

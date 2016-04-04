@@ -103,15 +103,6 @@ public class MockServer {
                 MediaType.TEXT_HTML).withBody(
                 new Raml2HtmlRenderer(specification).renderFull())));
 
-        // MASE: Temporary stub to check whether returning response defined in
-        // file is working
-        // TODO: Use transformer by which we first check whether there is
-        // response within responseFiles, then check whether there was a default
-        // response defined (by example) and otherwise return 405.
-        wireMockServer.stubFor(get(urlEqualTo("/test")).willReturn(
-            aResponse().withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
-                .withBody("Default test response")));
-
         final Collection<Resource> resources = specification.getResources()
             .values();
 

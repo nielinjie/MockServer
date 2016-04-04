@@ -2,8 +2,6 @@
 
 [![Build Status](https://semaphoreci.com/api/v1/projects/4398be27-000e-497f-af5a-e2127a383d1a/753049/badge.svg)](https://semaphoreci.com/uniknow/docmockrest)
 
-This README document the steps which are necessary to get DocMockRest up and running.
-
 [DocMockRest](http://uniknow.bitbucket.org/DocMockRest/) is a simple standalone server to mock RESTful API services specified by a RAML specification file. This system allows you to quickly define a REST API and have them return JSON, XML or any other type of response.
 
 ### How do I get it running? ###

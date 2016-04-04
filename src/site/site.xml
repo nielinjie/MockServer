@@ -23,6 +23,8 @@
         <version>1.4</version>
     </skin>
 
+    <googleAnalyticsAccountId></googleAnalyticsAccountId>
+
     <bannerLeft>
         <name>DockMockRest</name>
         <href>http://uniknow.bitbucket.org/DocMockRest/introduction.html</href>

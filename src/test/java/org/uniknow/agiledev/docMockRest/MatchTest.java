@@ -20,19 +20,16 @@ public class MatchTest {
 
     @Test
     public void shouldMatchBasic() {
-        stubFor(get(urlEqualTo("/my/resource"))
-                .withHeader("Accept", equalTo("text/xml"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody("<response>Some content</response>")));
+        stubFor(get(urlEqualTo("/my/resource")).withHeader("Accept",
+            equalTo("text/xml")).willReturn(
+            aResponse().withStatus(200).withHeader("Content-Type", "text/xml")
+                .withBody("<response>Some content</response>")));
 
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("http://localhost:" + wireMockRule.port() + "/my/resource")
-                .addHeader("Accept", "text/xml")
-                .build();
+            .url("http://localhost:" + wireMockRule.port() + "/my/resource")
+            .addHeader("Accept", "text/xml").build();
 
         Response response = null;
         try {
@@ -47,18 +44,18 @@ public class MatchTest {
     @Test
     public void shouldMatchPathWithIdParam() {
         stubFor(get(urlMatching("/my/resource/[0-9a-zA-Z.]*/details"))
-                .withHeader("Accept", equalTo("text/xml"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("Content-Type", "text/xml")
-                        .withBody("<response>Some content</response>")));
+            .withHeader("Accept", equalTo("text/xml")).willReturn(
+                aResponse().withStatus(200)
+                    .withHeader("Content-Type", "text/xml")
+                    .withBody("<response>Some content</response>")));
 
         OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("http://localhost:" + wireMockRule.port() + "/my/resource/id.23/details")
-                .addHeader("Accept", "text/xml")
-                .build();
+            .url(
+                "http://localhost:" + wireMockRule.port()
+                    + "/my/resource/id.23/details")
+            .addHeader("Accept", "text/xml").build();
 
         Response response = null;
         try {

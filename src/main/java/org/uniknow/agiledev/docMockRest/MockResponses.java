@@ -27,7 +27,8 @@ import java.io.InputStreamReader;
 import java.nio.file.*;
 
 /**
- * Checks whether response for request is defined and it not returns default response.
+ * Checks whether response for request is defined and it not returns default
+ * response.
  */
 @Validated
 public class MockResponses extends ResponseTransformer {
@@ -39,8 +40,9 @@ public class MockResponses extends ResponseTransformer {
 
     /**
      * Constructor
-     *
-     * @param responseFiles - Path to directory in which response files are defined.
+     * 
+     * @param responseFiles
+     *            - Path to directory in which response files are defined.
      */
     public MockResponses(Raml specification, String responseFiles) {
         this.specification = specification;
@@ -54,21 +56,21 @@ public class MockResponses extends ResponseTransformer {
         if (contentType != null) {
             try {
                 switch (contentType.mimeTypePart()) {
-                    case MediaType.APPLICATION_JSON:
-                        responseExtenstion = "json";
-                        break;
-                    case MediaType.TEXT_XML:
-                    case MediaType.APPLICATION_XML:
-                        responseExtenstion = "xml";
-                        break;
-                    case MediaType.TEXT_HTML:
-                        responseExtenstion = "html";
-                        break;
-                    case MediaType.TEXT_PLAIN:
-                        responseExtenstion = "txt";
-                        break;
-                    default:
-                        responseExtenstion = "txt";
+                case MediaType.APPLICATION_JSON:
+                    responseExtenstion = "json";
+                    break;
+                case MediaType.TEXT_XML:
+                case MediaType.APPLICATION_XML:
+                    responseExtenstion = "xml";
+                    break;
+                case MediaType.TEXT_HTML:
+                    responseExtenstion = "html";
+                    break;
+                case MediaType.TEXT_PLAIN:
+                    responseExtenstion = "txt";
+                    break;
+                default:
+                    responseExtenstion = "txt";
                 }
             } catch (NullPointerException err) {
                 responseExtenstion = "txt";
@@ -79,17 +81,20 @@ public class MockResponses extends ResponseTransformer {
 
         return responseExtenstion;
     }
+
     /**
      * TODO
-     *
+     * 
      * @param request
      * @param responseDefinition
      * @param fileSource
      * @return
      */
     @Override
-    public ResponseDefinition transform(Request request, ResponseDefinition responseDefinition, FileSource fileSource) {
-        // TODO: Check whether there is reponse defined for request if not use passed response definition.
+    public ResponseDefinition transform(Request request,
+        ResponseDefinition responseDefinition, FileSource fileSource) {
+        // TODO: Check whether there is reponse defined for request if not use
+        // passed response definition.
         System.out.println("Processing request for: " + request.getUrl());
 
         if (pathResponseFiles != null) {
@@ -97,75 +102,71 @@ public class MockResponses extends ResponseTransformer {
             String responseExtenstion = getExtensionResponseFile(request);
 
             // Check whether response for specific request is defined
-            Path pathResponseFile = Paths.get(pathResponseFiles, request.getUrl(), "response." + responseExtenstion);
+            Path pathResponseFile = Paths.get(pathResponseFiles,
+                request.getUrl(), "response." + responseExtenstion);
             if (Files.exists(pathResponseFile)) {
-                System.out.println("Response defined for " + request.getUrl() + " : " + pathResponseFile);
+                System.out.println("Response defined for " + request.getUrl()
+                    + " : " + pathResponseFile);
                 try {
-                    //StringBuffer response = new StringBuffer();
                     InputStream in = Files.newInputStream(pathResponseFile);
                     String response = IoUtil.convertStreamToString(in);
-//                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-//                    String line = null;
-//                    while((line = reader.readLine()) != null) {
-//                        response.append(line);
-//                    }
 
-                    return ResponseDefinitionBuilder
-                            .like(responseDefinition).but()
-                            .withBody(response)
-                            .build();
+                    return ResponseDefinitionBuilder.like(responseDefinition)
+                        .but().withBody(response).build();
 
-                } catch(IOException error) {
+                } catch (IOException error) {
                     return ResponseDefinitionBuilder
-                            .like(responseDefinition).but()
-                            .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-                            .withBody(error.getMessage())
-                            .build();
+                        .like(responseDefinition)
+                        .but()
+                        .withHeader(HttpHeaders.CONTENT_TYPE,
+                            MediaType.TEXT_PLAIN).withBody(error.getMessage())
+                        .build();
 
                 }
             }
         }
 
         if (responseDefinition.getBody() != null) {
-            // Return (default) response as defined within RAML file
-            return ResponseDefinitionBuilder
-                    .like(responseDefinition)
-                    .build();
+            return ResponseDefinitionBuilder.like(responseDefinition).build();
         } else {
             return ResponseDefinitionBuilder.like(responseDefinition).but()
-                    .withStatus(HttpStatus.SC_NOT_FOUND)
-                    .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-                    .withBody("No mocked response found for " + request.getUrl())
-                    .build();
+                .withStatus(HttpStatus.SC_NOT_FOUND)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+                .withBody("No mocked response found for " + request.getUrl())
+                .build();
         }
     }
 
     /**
      * Validates response that will be returned
-     *
+     * 
      * TODO
-     *
-     * @param response String containing response
+     * 
+     * @param response
+     *            String containing response
      * @return true if response valid; false otherwise
      */
     private boolean validateResponse(String response) {
 
         // If JSON response and JSON schema defined verify response
-//        if (responseExtenstion == "json") {
-//            // Get resource at which response applies
-//            Resource resource = specification.getResource(request.getUrl());
-//            if (resource != null) {
-//                // Get schema that should be applied (Issue: how to determine response code)
-//                Action action = resource.getAction(request.getMethod().value());
-//                String schema = action.getResponses().get("response code").getBody().get(request.contentTypeHeader().firstValue()).getSchema();
-//                JSONObject rawSchema = new JSONObject(new JSONTokener(schema));
-//                Schema jsonSchema = SchemaLoader.load(rawSchema);
-//
-//                jsonSchema.validate(new JSONObject(response));
-//            } else {
-//                System.out.println("Resource for request " + request.getUrl() + " could not be found?");
-//            }
-//        }
+        // if (responseExtenstion == "json") {
+        // // Get resource at which response applies
+        // Resource resource = specification.getResource(request.getUrl());
+        // if (resource != null) {
+        // // Get schema that should be applied (Issue: how to determine
+        // response code)
+        // Action action = resource.getAction(request.getMethod().value());
+        // String schema =
+        // action.getResponses().get("response code").getBody().get(request.contentTypeHeader().firstValue()).getSchema();
+        // JSONObject rawSchema = new JSONObject(new JSONTokener(schema));
+        // Schema jsonSchema = SchemaLoader.load(rawSchema);
+        //
+        // jsonSchema.validate(new JSONObject(response));
+        // } else {
+        // System.out.println("Resource for request " + request.getUrl() +
+        // " could not be found?");
+        // }
+        // }
         return true;
     }
 

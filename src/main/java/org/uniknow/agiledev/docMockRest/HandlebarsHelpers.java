@@ -1,6 +1,5 @@
 package org.uniknow.agiledev.docMockRest;
 
-
 import com.github.jknack.handlebars.*;
 import org.raml.model.SecurityReference;
 
@@ -13,7 +12,8 @@ public class HandlebarsHelpers {
         return new Helper<Object>() {
 
             @Override
-            public CharSequence apply(Object s, Options options) throws IOException {
+            public CharSequence apply(Object s, Options options)
+                throws IOException {
                 if (s != null) {
                     return s.toString().toLowerCase();
                 }
@@ -31,7 +31,8 @@ public class HandlebarsHelpers {
             public static final String NAME = "eachInMap";
 
             @Override
-            public CharSequence apply(Object context, Options options) throws IOException {
+            public CharSequence apply(Object context, Options options)
+                throws IOException {
 
                 if (context instanceof Iterable) {
                     Options.Buffer buffer = options.buffer();
@@ -45,13 +46,14 @@ public class HandlebarsHelpers {
                         Object it = loop.next();
                         Context itCtx = Context.newContext(parent, it);
                         itCtx.combine("@index", index)
-                                .combine("@first", index == base ? "first" : "")
-                                .combine("@last", !loop.hasNext() ? "last" : "")
-                                .combine("@odd", even ? "" : "odd")
-                                .combine("@even", even ? "even" : "")
-                                // 1-based index
-                                .combine("@index_1", index + 1);
-                        buffer.append(options.apply(fn, itCtx, Arrays.asList(it, index)));
+                            .combine("@first", index == base ? "first" : "")
+                            .combine("@last", !loop.hasNext() ? "last" : "")
+                            .combine("@odd", even ? "" : "odd")
+                            .combine("@even", even ? "even" : "")
+                            // 1-based index
+                            .combine("@index_1", index + 1);
+                        buffer.append(options.apply(fn, itCtx,
+                            Arrays.asList(it, index)));
                         index += 1;
                         even = !even;
                     }
@@ -61,7 +63,8 @@ public class HandlebarsHelpers {
                     }
                     return buffer;
                 } else if (context != null) {
-                    Iterator<Map.Entry<String, Object>> loop = options.propertySet(context).iterator();
+                    Iterator<Map.Entry<String, Object>> loop = options
+                        .propertySet(context).iterator();
                     Context parent = options.context;
                     boolean first = true;
                     Options.Buffer buffer = options.buffer();
@@ -71,11 +74,12 @@ public class HandlebarsHelpers {
                         Object key = entry.getKey();
                         Object value = entry.getValue();
                         Context itCtx = Context.newBuilder(parent, value)
-                                .combine("@key", key.toString())
-                                .combine("@first", first ? "first" : "")
-                                .combine("@last", !loop.hasNext() ? "last" : "")
-                                .build();
-                        buffer.append(options.apply(fn, itCtx, Arrays.asList(value, key)));
+                            .combine("@key", key.toString())
+                            .combine("@first", first ? "first" : "")
+                            .combine("@last", !loop.hasNext() ? "last" : "")
+                            .build();
+                        buffer.append(options.apply(fn, itCtx,
+                            Arrays.asList(value, key)));
                         first = false;
                     }
                     // empty?
@@ -92,7 +96,8 @@ public class HandlebarsHelpers {
     public static Helper<Object> highlightHelper() {
         return new Helper<Object>() {
             @Override
-            public CharSequence apply(Object o, Options options) throws IOException {
+            public CharSequence apply(Object o, Options options)
+                throws IOException {
                 return o.toString();
             }
         };
@@ -101,14 +106,18 @@ public class HandlebarsHelpers {
     public static Helper<Object> preOrLink() {
         return new Helper<Object>() {
             @Override
-            public CharSequence apply(Object o, Options options) throws IOException {
+            public CharSequence apply(Object o, Options options)
+                throws IOException {
                 if (o == null) {
                     return "";
                 }
                 if (o.toString().trim().startsWith("{")) {
-                    return new Handlebars.SafeString("<pre><code class=\"json\">" + o.toString() + "</code></pre>");
+                    return new Handlebars.SafeString(
+                        "<pre><code class=\"json\">" + o.toString()
+                            + "</code></pre>");
                 } else {
-                    return new Handlebars.SafeString(String.format("<a href=\"#%s\" >%s</a>", o.toString(), o.toString()));
+                    return new Handlebars.SafeString(String.format(
+                        "<a href=\"#%s\" >%s</a>", o.toString(), o.toString()));
                 }
             }
         };
@@ -117,16 +126,19 @@ public class HandlebarsHelpers {
     public static Helper<Object> toUniqueID() {
         return new Helper<Object>() {
             @Override
-            public CharSequence apply(Object o, Options options) throws IOException {
+            public CharSequence apply(Object o, Options options)
+                throws IOException {
                 if (o == null) {
                     return "";
                 } else if (o instanceof String) {
                     try {
-                        java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+                        java.security.MessageDigest md = java.security.MessageDigest
+                            .getInstance("MD5");
                         byte[] array = md.digest(((String) o).getBytes());
                         StringBuffer sb = new StringBuffer();
                         for (int i = 0; i < array.length; ++i) {
-                            sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+                            sb.append(Integer.toHexString(
+                                (array[i] & 0xFF) | 0x100).substring(1, 3));
                         }
                         return sb.toString();
                     } catch (java.security.NoSuchAlgorithmException e) {
@@ -142,7 +154,9 @@ public class HandlebarsHelpers {
     public static Helper<List<SecurityReference>> lockHelper() {
         return new Helper<List<SecurityReference>>() {
             @Override
-            public CharSequence apply(List<SecurityReference> securityReferences, Options options) throws IOException {
+            public CharSequence apply(
+                List<SecurityReference> securityReferences, Options options)
+                throws IOException {
                 if (!securityReferences.isEmpty()) {
                     return "<span class=\"glyphicon glyphicon-lock\" title=\"Authentication required\"></span>";
                 }
@@ -151,4 +165,3 @@ public class HandlebarsHelpers {
         };
     }
 }
-

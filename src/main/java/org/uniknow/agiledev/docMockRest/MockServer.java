@@ -38,14 +38,21 @@ public class MockServer {
 
     /**
      * Constructor Mock Server
-     *
-     * @param specificationFile Location of file containing RAML definition on which mocks will be based
-     * @param port              Port on which mock server will be reachable.
-     * @param responseFiles Location of files containing responses for mocked resources
-     * @throws FileNotFoundException if specification file doesn't exist
+     * 
+     * @param specificationFile
+     *            Location of file containing RAML definition on which mocks
+     *            will be based
+     * @param port
+     *            Port on which mock server will be reachable.
+     * @param responseFiles
+     *            Location of files containing responses for mocked resources
+     * @throws FileNotFoundException
+     *             if specification file doesn't exist
      */
-    public MockServer(String specificationFile, int port, String responseFiles) throws FileNotFoundException {
-        log.info("Starting MockServer using RAML file: {} on port: {}", specificationFile, port);
+    public MockServer(String specificationFile, int port, String responseFiles)
+        throws FileNotFoundException {
+        log.info("Starting MockServer using RAML file: {} on port: {}",
+            specificationFile, port);
 
         Raml raml = getSpecification(specificationFile);
 
@@ -54,9 +61,10 @@ public class MockServer {
 
     /**
      * Generates HTML documentation for specified RAML file.
-     *
-     * @param specification RAML specification that will be converted into HTML file
-     *
+     * 
+     * @param specification
+     *            RAML specification that will be converted into HTML file
+     * 
      * @return
      */
     private String generateHtml(Raml specification) {
@@ -67,26 +75,30 @@ public class MockServer {
     /**
      * Creates server mocking REST APIs which are specified within RAML model
      */
-    void createMockServer(@NotNull Raml specification, @Min(0) int port, String responseFiles) {
-        WireMockServer wireMockServer = new WireMockServer(
-                wireMockConfig().port(port).withRootDirectory(responseFiles).extensions(
-                        new MockResponses(specification, responseFiles)));
+    void createMockServer(@NotNull Raml specification, @Min(0) int port,
+        String responseFiles) {
+        WireMockServer wireMockServer = new WireMockServer(wireMockConfig()
+            .port(port).withRootDirectory(responseFiles)
+            .extensions(new MockResponses(specification, responseFiles)));
         wireMockServer.start();
 
         // Create stub returning info regarding mocked interfaces.
-        wireMockServer.stubFor(get(urlEqualTo("/info"))
-                .willReturn(aResponse()
-                        .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML)
-                        .withBody(new Raml2HtmlRenderer(specification).renderFull())));
+        wireMockServer.stubFor(get(urlEqualTo("/info")).willReturn(
+            aResponse().withHeader(HttpHeaders.CONTENT_TYPE,
+                MediaType.TEXT_HTML).withBody(
+                new Raml2HtmlRenderer(specification).renderFull())));
 
-        // MASE: Temporary stub to check whether returning response defined in file is working
-        // TODO: Use transformer by which we first check whether there is response within responseFiles, then check whether there was a default response defined (by example) and otherwise return 405.
-        wireMockServer.stubFor(get(urlEqualTo("/test"))
-                .willReturn(aResponse()
-                        .withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
-                        .withBody("Default test response")));
+        // MASE: Temporary stub to check whether returning response defined in
+        // file is working
+        // TODO: Use transformer by which we first check whether there is
+        // response within responseFiles, then check whether there was a default
+        // response defined (by example) and otherwise return 405.
+        wireMockServer.stubFor(get(urlEqualTo("/test")).willReturn(
+            aResponse().withHeader(HttpHeaders.CONTENT_TYPE, "text/plain")
+                .withBody("Default test response")));
 
-        final Collection<Resource> resources = specification.getResources().values();
+        final Collection<Resource> resources = specification.getResources()
+            .values();
 
         stubResources(wireMockServer, resources);
 
@@ -101,39 +113,50 @@ public class MockServer {
 
     /**
      * Returns REST API specification.
-     *
-     * @param specificationFile Location of RAML file that contains REST API specification
+     * 
+     * @param specificationFile
+     *            Location of RAML file that contains REST API specification
      * @return Rest API specification in the form of RAML model.
-     * @throws FileNotFoundException if specification file could not be found.
+     * @throws FileNotFoundException
+     *             if specification file could not be found.
      */
     @NotNull
-    Raml getSpecification(@NotNull String specificationFile) throws FileNotFoundException {
+    Raml getSpecification(@NotNull String specificationFile)
+        throws FileNotFoundException {
         log.debug("Loading specification file '{}'", specificationFile);
         File file = new File(specificationFile);
         if (!file.exists()) {
-            log.error("Specification file {} does not exists!", specificationFile);
-            throw new FileNotFoundException("Specification file '" + specificationFile + "' could not be found.");
+            log.error("Specification file {} does not exists!",
+                specificationFile);
+            throw new FileNotFoundException("Specification file '"
+                + specificationFile + "' could not be found.");
         }
 
         if (file.isDirectory()) {
             log.error("{} is a directory!", specificationFile);
-            throw new IllegalArgumentException("'" + specificationFile + "' is a directory.");
+            throw new IllegalArgumentException("'" + specificationFile
+                + "' is a directory.");
         }
 
-        Raml raml = new RamlDocumentBuilder(new FileResourceLoader(file.getParentFile().getAbsolutePath()))
-                .build(new FileInputStream(file), "");
-        log.info("Loaded specifications for REST API '{}' version '{}'", raml.getTitle(), raml.getVersion());
+        Raml raml = new RamlDocumentBuilder(new FileResourceLoader(file
+            .getParentFile().getAbsolutePath())).build(
+            new FileInputStream(file), "");
+        log.info("Loaded specifications for REST API '{}' version '{}'",
+            raml.getTitle(), raml.getVersion());
 
         return raml;
     }
 
     /**
      * Stub the passed resources recursively.
-     *
-     * @param wireMockServer Server that will be used to mock the resources
-     * @param resources Resources that will be mocked
+     * 
+     * @param wireMockServer
+     *            Server that will be used to mock the resources
+     * @param resources
+     *            Resources that will be mocked
      */
-    final void stubResources(@NotNull WireMockServer wireMockServer, @NotNull Collection<Resource> resources) {
+    final void stubResources(@NotNull WireMockServer wireMockServer,
+        @NotNull Collection<Resource> resources) {
         for (Resource resource : resources) {
             log.info("stub {}", resource.getUri());
 
@@ -141,91 +164,97 @@ public class MockServer {
                 stubJsonBodyExample(wireMockServer, resource);
             }
 
-            List<String> statusCodes = statusCodesThatHasExampleBody(resource, ActionType.GET);
+            List<String> statusCodes = statusCodesThatHasExampleBody(resource,
+                ActionType.GET);
             if (!statusCodes.isEmpty()) {
                 // only one response per resource is possible
-                stubJsonBodyExampleWithCode(wireMockServer, resource, statusCodes.get(0), ActionType.GET);
+                stubJsonBodyExampleWithCode(wireMockServer, resource,
+                    statusCodes.get(0), ActionType.GET);
             }
 
-            List<String> statusCodesPost = statusCodesThatHasExampleBody(resource, ActionType.POST);
+            List<String> statusCodesPost = statusCodesThatHasExampleBody(
+                resource, ActionType.POST);
             if (!statusCodesPost.isEmpty()) {
                 // only one response per resource is possible
-                stubJsonBodyExampleWithCode(wireMockServer, resource, statusCodesPost.get(0), ActionType.POST);
+                stubJsonBodyExampleWithCode(wireMockServer, resource,
+                    statusCodesPost.get(0), ActionType.POST);
             }
 
             if (!resource.getResources().isEmpty()) {
-                Collection<Resource> childResources = resource.getResources().values();
+                Collection<Resource> childResources = resource.getResources()
+                    .values();
                 stubResources(wireMockServer, childResources);
             }
         }
     }
 
-    // TODO: now only get and post on resource with responses  for status codes in RAML
-    private void stubJsonBodyExampleWithCode(WireMockServer wireMockServer, Resource resource, String statusCode,
-                                             ActionType actionType) {
+    // TODO: now only get and post on resource with responses for status codes
+    // in RAML
+    private void stubJsonBodyExampleWithCode(WireMockServer wireMockServer,
+        Resource resource, String statusCode, ActionType actionType) {
         String resourceMatch = replaceResourceIdWithAnyMatcher(resource);
-//        log.debug("stub {},  status code: {} resourceMatch: {}",
-//                resource.getUri(),
-//                statusCode,
-//                resourceMatch);
+        // log.debug("stub {},  status code: {} resourceMatch: {}",
+        // resource.getUri(),
+        // statusCode,
+        // resourceMatch);
 
-        // TODO: Requires that content-type header is set, should check whether that can be defined in RAML file (mediaTypeExtension).
+        // TODO: Requires that content-type header is set, should check whether
+        // that can be defined in RAML file (mediaTypeExtension).
         MappingBuilder urlMatcher;
         switch (actionType) {
 
-            case GET:
-                urlMatcher = get(urlMatching(resourceMatch));
-                break;
+        case GET:
+            urlMatcher = get(urlMatching(resourceMatch));
+            break;
 
-            case POST:
-                urlMatcher = post(urlMatching(resourceMatch));
-                break;
+        case POST:
+            urlMatcher = post(urlMatching(resourceMatch));
+            break;
 
-            default:
-                log.warn("[" + actionType + "]" + resourceMatch + " is not supported yet");
-                return;
+        default:
+            log.warn("[" + actionType + "]" + resourceMatch
+                + " is not supported yet");
+            return;
         }
 
         // Create mock for resource
-        wireMockServer.stubFor(
-                urlMatcher
-                        .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
-                        .willReturn(aResponse()
-                                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                                .withStatus(Integer.parseInt(statusCode))
-                                .withBody(resource.getAction(actionType)
-                                        .getResponses()
-                                        .get(statusCode)
-                                        .getBody()
-                                        .get("application/json")
-                                        .getExample())));
+        wireMockServer.stubFor(urlMatcher.withHeader(HttpHeaders.CONTENT_TYPE,
+            equalTo("application/json")).willReturn(
+            aResponse()
+                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .withStatus(Integer.parseInt(statusCode))
+                .withBody(
+                    resource.getAction(actionType).getResponses()
+                        .get(statusCode).getBody().get("application/json")
+                        .getExample())));
     }
 
     // TODO: now only get on resource without responses for status codes in RAML
-    private void stubJsonBodyExample(WireMockServer wireMockServer, Resource resource) {
-//        String resourceMatch = replaceResourceIdWithAnyMatcher(resource);
-//        log.debug("stubJsonBodyExample:{} resourceMatch: {}:", resource.getUri(), resourceMatch);
+    private void stubJsonBodyExample(WireMockServer wireMockServer,
+        Resource resource) {
+        // String resourceMatch = replaceResourceIdWithAnyMatcher(resource);
+        // log.debug("stubJsonBodyExample:{} resourceMatch: {}:",
+        // resource.getUri(), resourceMatch);
 
         log.debug("stub [GET]" + resource.getUri());
-        wireMockServer.stubFor(
-                get(urlEqualTo(resource.getUri()))
-                        .withHeader(HttpHeaders.CONTENT_TYPE, equalTo("application/json"))
-                        .willReturn(aResponse()
-                                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                                .withBody(resource.getAction(ActionType.GET)
-                                        .getBody()
-                                        .get("application/json")
-                                        .getExample())));
+        wireMockServer.stubFor(get(urlEqualTo(resource.getUri())).withHeader(
+            HttpHeaders.CONTENT_TYPE, equalTo("application/json")).willReturn(
+            aResponse()
+                .withHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                .withBody(
+                    resource.getAction(ActionType.GET).getBody()
+                        .get("application/json").getExample())));
     }
 
     /**
      * Replaces {id} within URI of resource by id
-     *
+     * 
      * @param resource
      * @return
      */
     private String replaceResourceIdWithAnyMatcher(Resource resource) {
-        return resource.getUri().replaceAll("\\{[0-9a-zA-Z]*\\}", "[0-9a-zA-Z.]*");
+        return resource.getUri().replaceAll("\\{[0-9a-zA-Z]*\\}",
+            "[0-9a-zA-Z.]*");
     }
 
     private List<String> statusCodesThatHasExampleBody(Resource resource, ActionType actionType) {
@@ -238,22 +267,27 @@ public class MockServer {
                         Collectors.toList());
     }
 
-    private boolean hasAJsonBodyExampleByStatusCode(Resource resource, String statusCode, ActionType actionType) {
+    private boolean hasAJsonBodyExampleByStatusCode(Resource resource,
+        String statusCode, ActionType actionType) {
         return resource.getAction(actionType) != null
-                && !resource.getAction(actionType).hasBody()
-                && resource.getAction(actionType).getResponses() != null
-                && resource.getAction(actionType).getResponses().containsKey(statusCode)
-                && resource.getAction(actionType).getResponses().get(statusCode).hasBody()
-                && resource.getAction(actionType).getResponses().get(statusCode).getBody()
-                .containsKey("application/json")
-                && resource.getAction(actionType).getResponses().get(statusCode).getBody().get("application/json")
-                .getExample() != null;
+            && !resource.getAction(actionType).hasBody()
+            && resource.getAction(actionType).getResponses() != null
+            && resource.getAction(actionType).getResponses()
+                .containsKey(statusCode)
+            && resource.getAction(actionType).getResponses().get(statusCode)
+                .hasBody()
+            && resource.getAction(actionType).getResponses().get(statusCode)
+                .getBody().containsKey("application/json")
+            && resource.getAction(actionType).getResponses().get(statusCode)
+                .getBody().get("application/json").getExample() != null;
     }
 
     private boolean hasAJsonBodyExample(Resource resource) {
         return resource.getAction(ActionType.GET) != null
-                && resource.getAction(ActionType.GET).hasBody()
-                && resource.getAction(ActionType.GET).getBody().containsKey("application/json")
-                && resource.getAction(ActionType.GET).getBody().get("application/json").getExample() != null;
+            && resource.getAction(ActionType.GET).hasBody()
+            && resource.getAction(ActionType.GET).getBody()
+                .containsKey("application/json")
+            && resource.getAction(ActionType.GET).getBody()
+                .get("application/json").getExample() != null;
     }
 }

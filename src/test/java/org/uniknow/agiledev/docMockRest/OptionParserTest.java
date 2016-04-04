@@ -19,8 +19,10 @@ public class OptionParserTest {
     @Before
     public void setup() {
         parser = new OptionParser("r::");
-        parser.acceptsAll(asList("r", "ramlfile")).withRequiredArg().required().ofType(String.class);
-        port = parser.acceptsAll(asList("p", "port")).withRequiredArg().required().ofType(Integer.class);
+        parser.acceptsAll(asList("r", "ramlfile")).withRequiredArg().required()
+            .ofType(String.class);
+        port = parser.acceptsAll(asList("p", "port")).withRequiredArg()
+            .required().ofType(Integer.class);
     }
 
     @Test

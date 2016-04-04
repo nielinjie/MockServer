@@ -24,11 +24,12 @@ public class MockServerTest {
      */
     @Test(expected = ValidationException.class)
     public void testConstructorRamlFileNull() throws FileNotFoundException {
-        new MockServer(null,0, "test");
+        new MockServer(null, 0, "test");
     }
 
     /**
-     * Verifies ValidationException is thrown when specified port number is below zero
+     * Verifies ValidationException is thrown when specified port number is
+     * below zero
      */
     @Test(expected = ValidationException.class)
     public void testCreateMockServerPortNumberBelowZero() {
@@ -36,7 +37,7 @@ public class MockServerTest {
         Raml model = createMock(Raml.class);
         replay(model);
 
-        server.createMockServer(model, -1,"test");
+        server.createMockServer(model, -1, "test");
     }
 
     /**
@@ -46,11 +47,12 @@ public class MockServerTest {
     public void testCreateMockServerSpecificationNull() {
         MockServer server = new MockServer();
 
-        server.createMockServer(null, 1,"test");
+        server.createMockServer(null, 1, "test");
     }
 
     /**
-     * Verifies ValidationException occurs when collection of stubbed resources is null
+     * Verifies ValidationException occurs when collection of stubbed resources
+     * is null
      */
     @Test(expected = ValidationException.class)
     public void stubResourcesNull() {

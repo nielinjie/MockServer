@@ -17,7 +17,8 @@ public class HandlebarsFactory {
         handlebars.registerHelper("toUniqueID", HandlebarsHelpers.toUniqueID());
         handlebars.registerHelper("lower", HandlebarsHelpers.lowerCaseHelper());
         handlebars.registerHelper("lock", HandlebarsHelpers.lockHelper());
-        handlebars.registerHelper("highlight", HandlebarsHelpers.highlightHelper());
+        handlebars.registerHelper("highlight",
+            HandlebarsHelpers.highlightHelper());
         handlebars.registerHelper("preOrLink", HandlebarsHelpers.preOrLink());
 
         return handlebars;

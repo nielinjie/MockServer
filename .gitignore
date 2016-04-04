@@ -22,6 +22,6 @@ bin/
 .idea/
 
 # Project specific
-resources/
+info/
 
 

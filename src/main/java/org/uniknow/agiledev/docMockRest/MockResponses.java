@@ -30,6 +30,8 @@ import org.json.JSONTokener;
 import org.raml.model.Action;
 import org.raml.model.Raml;
 import org.raml.model.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
 
 import javax.validation.constraints.NotNull;
@@ -47,6 +49,9 @@ import java.nio.file.*;
  */
 @Validated
 public class MockResponses extends ResponseTransformer {
+
+    private final static Logger LOG = LoggerFactory
+        .getLogger(MockResponses.class);
 
     private final String pathResponseFiles;
 
@@ -110,7 +115,7 @@ public class MockResponses extends ResponseTransformer {
         ResponseDefinition responseDefinition, FileSource fileSource) {
         // TODO: Check whether there is reponse defined for request if not use
         // passed response definition.
-        System.out.println("Processing request for: " + request.getUrl());
+        LOG.debug("Processing request for '{}'", request.getUrl());
 
         if (pathResponseFiles != null) {
             // Determine extension of response file
@@ -120,8 +125,8 @@ public class MockResponses extends ResponseTransformer {
             Path pathResponseFile = Paths.get(pathResponseFiles,
                 request.getUrl(), "response." + responseExtenstion);
             if (Files.exists(pathResponseFile)) {
-                System.out.println("Response defined for " + request.getUrl()
-                    + " : " + pathResponseFile);
+                LOG.debug("Response defined for '{}' : {}", request.getUrl(),
+                    pathResponseFile);
                 try {
                     InputStream in = Files.newInputStream(pathResponseFile);
                     String response = IoUtil.convertStreamToString(in);

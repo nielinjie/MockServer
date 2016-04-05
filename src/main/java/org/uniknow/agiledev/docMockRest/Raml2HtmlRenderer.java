@@ -19,6 +19,8 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.StringTemplateSource;
 import org.raml.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -30,6 +32,9 @@ import static java.lang.String.format;
  */
 
 public class Raml2HtmlRenderer {
+
+    private final static Logger LOG = LoggerFactory
+        .getLogger(Raml2HtmlRenderer.class);
 
     private final Handlebars handlebars;
     private final Raml raml;
@@ -49,12 +54,12 @@ public class Raml2HtmlRenderer {
     }
 
     public String renderResource(String uri) {
-        System.out.println("Rendering " + uri);
+        LOG.debug("Rendering {}", uri);
         return renderResource(uri, null);
     }
 
     public String renderResource(String uri, String resourceTemplateFile) {
-        System.out.println("Rendering " + uri);
+        LOG.debug("Rendering {}", uri);
         return renderClassPathTemplate(
             orDefault(resourceTemplateFile, "resource.hbs"),
             getResourceContext(uri));

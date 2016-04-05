@@ -23,13 +23,26 @@
         <version>1.4</version>
     </skin>
 
+    <googleAnalyticsAccountId></googleAnalyticsAccountId>
+
     <bannerLeft>
-        <name>UniKnow</name>
+        <name>DockMockRest</name>
+        <href>http://uniknow.bitbucket.org/DocMockRest/introduction.html</href>
     </bannerLeft>
 
     <bannerRight>
         <name>DockMockRest</name>
+        <src>images/DocMockRest-logo.jpg</src>
+        <href>http://uniknow.bitbucket.org/DocMockRest/introduction.html</href>
+        <title>DocMockRest</title>
     </bannerRight>
+
+    <poweredBy>
+        <logo name="UniKnow"
+              href="http://uniknow.bitbucket.org/"
+              img="http://uniknow.bitbucket.org/images/UniKnow-logo.png"
+              title="UniKnow"/>
+    </poweredBy>
 
     <body>
 

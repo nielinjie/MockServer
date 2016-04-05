@@ -63,6 +63,273 @@ That’s much of the basic information covered, so now let’s move onto resourc
 
 ### Describing Resources
 
-TODO
+Continuing at the top level of your RAML file, the next step is to outline the available resources. Here’s an example:
 
+    /albums:
+	    displayName: Album
+    /artists:
+	    displayName: Artist
 
+Here we’ve defined two top-level resources, `albums` and `artists`. What we haven’t yet done is described the HTTP methods which can be used to interact with them, but first let’s drill down a little and look at resource URIs and sub-resources.
+
+Let’s suppose specific albums are represented by their ISRC (International Standard Recording Code); so let’s expand our `/albums` resource to describe this:
+
+    /albums:
+    	/{isrc}:
+    		uriParameters:
+          isrc:
+            description: The International Standard Recording Code which uniquely identifies this album
+    		type: string
+    		pattern: ^[a-zA-Z]{2}\-[0-9a-zA-Z]{3}\-\d{2}\-\d{5}$
+
+As you can see, URI parameters are denoted by curly brackets. The `uriParameters` property can be used to provide additional information about these parameters, both meta-information (in this case, a `description`) as well as a concrete definition of their format – in this example, the data type and a regular expression which defines the specific format.
+
+Using nesting, we can describe sub-resources. For example, suppose we provide an endpoint to retrieve an individual album’s tracklisting:
+
+    /albums:
+    	/{isrc}:
+    		uriParameters:
+          isrc:
+            description: The International Standard Recording Code which uniquely identifies this album
+    		type: string
+    		pattern: ^[a-zA-Z]{2}\-[0-9a-zA-Z]{3}\-\d{2}\-\d{5}$
+    		/tracks:
+    			displayName: Tracklisting
+
+You can have as much nesting of resources as you wish; just use YAML-style indentation.
+
+Now let’s move onto defining the methods one can use on these resources.
+
+### HTTP Methods
+
+Most REST_ful_ APIs tend to implement the four most common HTTP methods; `GET` for retrieval, `PUT` for updates, `POST` for creation and `DELETE` for, well, deleting resources. Our example API is no different. So, let’s modify our albums resource to reflect this:
+
+    /albums:
+    	get:
+    		description: Retrieve a list of albums
+    	post:
+    			description: Create a new album
+    	/{isrc}:
+    		uriParameters:
+          isrc:
+            description: The International Standard Recording Code which uniquely identifies this album
+    		type: string
+    		pattern: ^[a-zA-Z]{2}\-[0-9a-zA-Z]{3}\-\d{2}\-\d{5}$
+    		get:
+    			description: Retrieve the specified album
+    		put:
+    			description: Update an album
+    		delete:
+    			description: Delete this album
+
+Here we’re indicating that a `GET` request to `/albums` will retrieve a list of albums, and a `POST` to the same URI is used to create one. Drilling-down, a `GET` request to `/albums/{isrc}` will retrieve information about a specific album, specified using the URI parameter `isrc`. a `PUT` request is used to update the album, a `DELETE` request to delete it.
+
+### Describing responses
+
+Now that we’ve defined our resources and the available methods, we need to be able to describe the responses a user can expect.
+
+In order to demonstrate this, we’ll provide some additional detail about specific albums.
+
+In order to describe responses, we need to drill down a few more levels. First, we need to describe the possible response codes, and thereafter we need to break down responses into their components – typically, the response body – and then the possible response media types. Here’s an example to make that a little clearer:
+
+    /albums:
+    	/{isrc}:
+    		get:
+    			description: Retrieve the specified album
+    		responses:
+           200:
+             body:
+               application/json:
+                 schema: |
+                   { 	"$schema": "http://json-schema.org/schema",
+                     	"type": "object",
+                     	"description": "An album",
+                     	"properties": {
+    										"title": { "type": "string" },
+    										"artist": { "type": "string" },
+    										"label": { "type": "string" },
+    										"year": { "type": "integer" }
+    									},
+    									"required": [ "title", "artist" ]
+                    }
+    				example: |
+                    { "title": "Dubnobasswithmyheadman",
+    									"artist": "Underworld",
+    									"label": "Junior Boy's Own",
+    									"year": 1994
+                    }
+
+Here we’re demonstrating a successful response – i.e., one with an HTTP response code of `200`. What we’re interested in specifically is the response body, although you can also define any response headers here too. We then drill down into the available response types; in this case, we’re just representing JSON – though you’re free to define multiple response types if your API supports them.
+
+Once we get down to a successful response’s body, we specify two properties; schema and example.
+
+The schema property contains a http://json-schema.org/[JSON schema] which defines the structure of the expected JSON. I’ll be covering JSON schema in another article very soon. The example property contains just that, making it clear what sort of response someone calling your API can expect.
+
+### Query Parameters
+
+We can define query parameters (typically for `GET` requests) in a very similar manner in which we defined URI parameters.
+
+To illustrate, let’s look again at our `/albums` endpoint, supposing that we wanted to implement pagination; so, we probably want to provide a query parameter named `page` which allows the requesting party to specify which page they want to retrieve.
+
+Here’s how we might do that:
+
+    /albums:
+      get:
+        description: Retrieve a list of albums
+        queryParameters:
+          page:
+            description: Specify the page that you want to retrieve
+            type: integer
+            example: 1
+
+Again, the definition of the query parameter is a mixture of meta-information – such as the `description` and an `example` – and some properties which help explicitly define what the API expects; here we’re making it clear that the page parameter should be an `integer`.
+
+### Request Data
+
+Let’s revisit our “Create an album” endpoint, which you’ll recall involves making a `POST` request to the `/albums` URI.
+
+We can expand upon this by describing the data someone is required to include, the mechanism used to provide it, and some specifics about the various fields.
+
+Here’s an example:
+
+    /albums:
+    	get:
+    		description: Retrieve a list of albums
+    	post:
+    		description: Create a new album
+    	body:
+    		application/x-www-form-urlencoded:
+    			formParameters:
+    				isrc:
+    					description: The International Standard Recording Code which uniquely identifies this album
+    					type: string
+    					pattern: ^[a-zA-Z]{2}\-[0-9a-zA-Z]{3}\-\d{2}\-\d{5}$
+    					required: true
+    				name:
+    					description: The name of the album
+    					type: string
+    					required: true
+    				artist:
+    					description: The name of the artist
+    					type: string
+    					required: true
+    				label:
+    					description: The label it was released under
+    					type: string
+    					required: false
+    				year:
+    					description: The year the album was released
+    					type: integer
+    					required: false
+    					minimum: 1900
+    					maximum: 3000
+
+Here we’re defining the expected request body when POSTing to this endpoint. We’re indicating that the request should be of type `application/x-www-form-urlencoded`.
+
+Next, we break down the expected request body into parameters with the `formParameters` property. Then we list the possible fields, provide some meta-data about each one, as well as the expected `type`. We can also indicate which fields are required and which are optional, as well as some validation rules – in this case we use a regular expression to dictate the format of the ISRC, and some relatively sensible boundaries for the year of release.
+
+### Security
+
+Chances are your API is secured in some way – be it using OAuth, access tokens or simply just HTTP Basic Authentication.
+
+In RAML you can define your security schemes towards the top of your file, alongside the basic information. You’ll find some examples in the http://raml.org/spec.html[specification document], but as an example let’s look at OAuth2. Here’s what the security scheme definition might look like:
+
+    securitySchemes:
+      - oauth_2_0:
+          description: |
+            Acme uses OAuth2 to authenticate most requests
+          type: OAuth 2.0
+          describedBy:
+            headers:
+              Authorization:
+                description: |
+                  Used to send a valid OAuth 2 access token. Do not use
+                  with the "access_token" query string parameter.
+                type: string
+            queryParameters:
+              access_token:
+                description: |
+                  Used to send a valid OAuth 2 access token. Do not use together with
+                  the "Authorization" header
+                type: string
+            responses:
+    					400:
+                description: |
+                  Bad OAuth request (e.g. wrong consumer key, bad nonce, expired
+                  timestamp, etc.)
+              401:
+                description: |
+                  Bad or expired token. To fix it, re-authenticate the user.
+          settings:
+            authorizationUri: https://acme.com/oauth/authorize
+            accessTokenUri: https://acme.com/oauth/token
+            authorizationGrants: [ code, token ]
+
+If you look through this, you’ll see it provides a number of key pieces of information;
+
+* The `type` indicates that we’re implementing OAuth 2.0
+* To authenticate, the API in question expects either an `Authorization` header or an `access_token` query parameter
+* It lists the possible responses, what they mean and how to fix them
+* The `settings` are specific to OAuth but nonetheless vital; it tells users how to authorize, where to obtain an access token and the OAuth grant types this API supports.
+
+However, this simply defines the security schemes; we still need to indicate that this is what we’re using to secure our API.
+
+One way is to add the following towards the top of your RAML file:
+
+    securedBy: [oauth_2_0]
+
+NOTE: `oauth_2_0` matches the element immediately beneath `securitySchemes`
+
+Some APIs, however, make some endpoints publicly available, but others may be protected. You can define the security approach on a per-endpoint basis, for example:
+
+    /albums:
+    	get:
+    		securedBy: [null, oauth_2_0]
+    	post:
+    		securedBy: [oauth_2_0]
+
+Here we’re indicating that authentication is optional for retrieving a list of albums, but that a user must be authenticated in order to create one.
+
+### Traits
+
+You’ll probably have certain behaviors, policies or characteristics which are common across different endpoints. A good example is pagination; various collections which support pagination will no doubt use the same approach, to keep the API consistent. Or, as we’ve seen in the Security section, you may have different degrees of security, such as public or “authorization required”.
+
+Rather than repeat the same configuration across multiple endpoints, you can define traits.
+
+Here’s a simple example of creating a trait to indicate that the results from a given endpoint support simple pagination:
+
+    traits:
+      - paged:
+          queryParameters:
+    		page:
+    			description: Specify the page that you want to retrieve
+    			type: integer
+    			required: true
+    			example: 1
+
+Now you can apply this to an endpoint using the `is` property, like so:
+
+    /albums:
+      get:
+        is: [ paged ]
+
+You can also pass in variables. As an example, let’s extend our paged trait to include a number of results per page. We’ll specify a maximum number of results per page, which can be overridden on a per-endpoint basis. Here’s the trait definition:
+
+    traits:
+      - paged:
+          queryParameters:
+    		page:
+    			description: Specify the page that you want to retrieve
+    			type: integer
+    			required: true
+    			example: 1
+            perPage:
+    			type: integer
+    			description: The number of results per page, not to exceed <<maxPerPage>>
+    			maximum: <<maxPerPage>>
+
+Notice how we can use the variable `maxPerPage` both as a maximum restriction, as well as substituting it into our generated documentation.
+
+To use this, change the definition of the `GET /albums` endpoint to the following:
+
+You’ll find more examples of traits, along with resource types – which share certain characteristics with traits – in the http://raml.org/spec.html[specification]. You’ll also find plenty of other documentation along with examples of some of the more complex scenarios you may need to describe.

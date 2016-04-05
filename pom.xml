@@ -25,7 +25,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>DocMockRest</name>
     <description>
-        Proof of Concept using RAML for documenting and mocking REST API
+        Framework for documenting and mocking REST API based on RAML specification file.
     </description>
 
     <scm>

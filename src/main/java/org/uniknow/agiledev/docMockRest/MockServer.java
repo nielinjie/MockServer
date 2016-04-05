@@ -89,6 +89,9 @@ public class MockServer {
 
     /**
      * Creates server mocking REST APIs which are specified within RAML model
+     *
+     * @param specification RAML specification
+     * @param port HTTP port on which mocket REST API can be reached.
      */
     void createMockServer(@NotNull Raml specification, @Min(0) int port,
         String responseFiles) {

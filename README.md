@@ -34,4 +34,4 @@ The structure of the response files matches the URI of the resources within the 
 ### Who do I talk to? ###
 
 * [UniKnow](mailto:uniknow.info@gmail.com)
-* TODO: Setup jira
+* [Issue reporting](https://bitbucket.org/uniknow/docmockrest/issues)

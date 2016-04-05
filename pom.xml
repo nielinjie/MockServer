@@ -30,12 +30,16 @@
 
     <scm>
         <connection>scm:git:ssh://bitbucket.org:uniknow/docmockrest.git</connection>
-
         <url>https://bitbucket.org/uniknow/docmockrest.git</url>
         <developerConnection>scm:git:ssh://bitbucket.org:uniknow/docmockrest.git
         </developerConnection>
         <tag>HEAD</tag>
     </scm>
+
+    <issueManagement>
+        <system>Issue Tracker</system>
+        <url>https://bitbucket.org/uniknow/docmockrest/issues</url>
+    </issueManagement>
 
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>

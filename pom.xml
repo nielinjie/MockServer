@@ -349,6 +349,7 @@
                         <attributes>
                             <site-url>${site.url}</site-url>
                             <project-name>${project.name}</project-name>
+                            <issue-management>${issueManagement.url}</issue-management>
                             <imagesdir>${project.basedir}/src/site/resources/images</imagesdir>
                         </attributes>
                     </asciidoc>

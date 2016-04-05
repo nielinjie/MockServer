@@ -33,6 +33,10 @@
 
     <body>
 
+        <menu name="Essentials">
+            <item href="about.html" name="About"/>
+        </menu>
+
         <menu name="Documentation">
             <item href="introduction.html" name="Introduction" />
             <item href="raml.html" name="RAML" />

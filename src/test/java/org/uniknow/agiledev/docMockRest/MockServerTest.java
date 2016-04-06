@@ -47,7 +47,8 @@ public class MockServerTest {
      * below zero
      */
     @Test(expected = ValidationException.class)
-    public void testCreateMockServerPortNumberBelowZero() {
+    public void testCreateMockServerPortNumberBelowZero()
+        throws FileNotFoundException {
         MockServer server = new MockServer();
         Raml model = createMock(Raml.class);
         replay(model);
@@ -59,7 +60,8 @@ public class MockServerTest {
      * Verifies ValidationException is thrown when specification is null
      */
     @Test(expected = ValidationException.class)
-    public void testCreateMockServerSpecificationNull() {
+    public void testCreateMockServerSpecificationNull()
+        throws FileNotFoundException {
         MockServer server = new MockServer();
 
         server.createMockServer(null, 1, "test");

@@ -80,10 +80,11 @@ public class MockServer {
      * @param specification
      *            RAML specification that will be converted into HTML file
      * 
-     * @return
+     * @return RAML specification as HTML page.
      */
-    private String generateHtml(Raml specification) {
-        String ramlHtml = new Raml2HtmlRenderer(specification).renderFull();
+    private String generateHtml(Raml specification)
+        throws FileNotFoundException {
+        String ramlHtml = new Raml2HtmlRenderer(specification).render();
         return ramlHtml;
     }
 
@@ -96,7 +97,7 @@ public class MockServer {
      *            HTTP port on which mocket REST API can be reached.
      */
     void createMockServer(@NotNull Raml specification, @Min(0) int port,
-        String responseFiles) {
+        String responseFiles) throws FileNotFoundException {
         WireMockServer wireMockServer = new WireMockServer(wireMockConfig()
             .port(port).withRootDirectory(responseFiles)
             .extensions(new MockResponses(specification, responseFiles)));
@@ -106,7 +107,7 @@ public class MockServer {
         wireMockServer.stubFor(get(urlEqualTo("/info")).willReturn(
             aResponse().withHeader(HttpHeaders.CONTENT_TYPE,
                 MediaType.TEXT_HTML).withBody(
-                new Raml2HtmlRenderer(specification).renderFull())));
+                new Raml2HtmlRenderer(specification).render())));
 
         final Collection<Resource> resources = specification.getResources()
             .values();

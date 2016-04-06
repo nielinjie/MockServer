@@ -15,14 +15,28 @@
  */
 package org.uniknow.agiledev.docMockRest;
 
+import org.uniknow.agiledev.dbc4java.Validated;
+
+import javax.validation.constraints.NotNull;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+@Validated
 public class IoUtil {
 
-    public static String contentFromFile(String fileName) {
-        return convertStreamToString(IoUtil.class.getClassLoader()
-            .getResourceAsStream(fileName));
+    public static String contentFromFile(String fileName)
+        throws FileNotFoundException {
+        InputStream in = IoUtil.class.getClassLoader().getResourceAsStream(
+            fileName);
+
+        if (in == null) {
+            throw new FileNotFoundException(fileName + " could not be found");
+        } else {
+            return convertStreamToString(in);
+        }
     }
 
-    public static String convertStreamToString(java.io.InputStream is) {
+    public static String convertStreamToString(@NotNull InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
         return s.hasNext() ? s.next() : "";
     }

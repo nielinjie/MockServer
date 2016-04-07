@@ -18,6 +18,8 @@ package org.uniknow.agiledev.docMockRest;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.StringTemplateSource;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.raml.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +72,7 @@ public class Raml2HtmlRenderer {
      *             found.
      */
     public String render() throws FileNotFoundException {
-        return render(null);
+        return render(DEFAULT_TEMPLATE);
     }
 
     /**
@@ -85,28 +87,30 @@ public class Raml2HtmlRenderer {
      *             if template used to render RAML specification could not be
      *             found.
      */
-    public String render(String templateFile) throws FileNotFoundException {
-        return render(
-            IoUtil.contentFromFile(orDefault(templateFile, DEFAULT_TEMPLATE)),
-            raml);
+    public String render(@NotNull @NotEmpty @NotBlank String templateFile)
+        throws FileNotFoundException {
+        return render(IoUtil.contentFromFile(templateFile), raml);
     }
 
-    private String render(String templateFile, Object context) {
+    /**
+     * Renders the RAML definition using the specified template file.
+     * 
+     * @param templateFile
+     *            template file that will be used to render the RAML definition.
+     * @param raml
+     *            RAML definition.
+     * 
+     * @return HTML documentation RAML definition.
+     */
+    private String render(String templateFile, Object raml) {
         LOG.debug("Rendering RAML specification with template {}", templateFile);
         try {
             Template template = handlebars.compile(new StringTemplateSource(
                 "raml_template", templateFile));
-            return template.apply(context);
+            return template.apply(raml);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    <T> T orDefault(T nullable, T defaultValue) {
-        if (nullable == null) {
-            return defaultValue;
-        }
-        return nullable;
     }
 
 }

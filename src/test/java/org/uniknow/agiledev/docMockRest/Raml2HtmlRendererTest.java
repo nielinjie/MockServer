@@ -40,7 +40,8 @@ public class Raml2HtmlRendererTest {
     }
 
     /**
-     * Check what happens if non existing template is specified
+     * Check FileNotFoundException occurs when non existing template is
+     * specified
      */
     @Test(expected = FileNotFoundException.class)
     public void renderWithNonExistingTemplate() throws FileNotFoundException {
@@ -49,6 +50,42 @@ public class Raml2HtmlRendererTest {
 
         Raml2HtmlRenderer renderer = new Raml2HtmlRenderer(raml);
         renderer.render("non-existing-template");
+    }
+
+    /**
+     * Checks ValidationException occurs when template null is specified
+     */
+    @Test(expected = ValidationException.class)
+    public void renderWithTemplateNull() throws FileNotFoundException {
+        Raml raml = createMock(Raml.class);
+        replay(raml);
+
+        Raml2HtmlRenderer renderer = new Raml2HtmlRenderer(raml);
+        renderer.render(null);
+    }
+
+    /**
+     * Checks ValidationException occurs when template is blank string
+     */
+    @Test(expected = ValidationException.class)
+    public void renderWithTemplateBlank() throws FileNotFoundException {
+        Raml raml = createMock(Raml.class);
+        replay(raml);
+
+        Raml2HtmlRenderer renderer = new Raml2HtmlRenderer(raml);
+        renderer.render("   ");
+    }
+
+    /**
+     * Checks ValidationException occurs when template is empty string
+     */
+    @Test(expected = ValidationException.class)
+    public void renderWithTemplateEmpty() throws FileNotFoundException {
+        Raml raml = createMock(Raml.class);
+        replay(raml);
+
+        Raml2HtmlRenderer renderer = new Raml2HtmlRenderer(raml);
+        renderer.render("");
     }
 
 }

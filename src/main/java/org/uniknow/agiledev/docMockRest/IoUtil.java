@@ -15,8 +15,11 @@
  */
 package org.uniknow.agiledev.docMockRest;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.uniknow.agiledev.dbc4java.Validated;
 
+import javax.validation.ValidationException;
 import javax.validation.constraints.NotNull;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -24,20 +27,39 @@ import java.io.InputStream;
 @Validated
 public class IoUtil {
 
+    /**
+     * Returns content of file on classpath.
+     * 
+     * @param fileName
+     *            Name of file
+     * @return content of file
+     * @throws FileNotFoundException
+     *             when specified file could not be found.
+     */
     public static String contentFromFile(String fileName)
         throws FileNotFoundException {
-        InputStream in = IoUtil.class.getClassLoader().getResourceAsStream(
-            fileName);
+        if ((fileName != null) && !fileName.trim().isEmpty()) {
+            InputStream in = IoUtil.class.getClassLoader().getResourceAsStream(
+                fileName);
 
-        if (in == null) {
-            throw new FileNotFoundException(fileName + " could not be found");
+            if (in == null) {
+                throw new FileNotFoundException(fileName
+                    + " could not be found");
+            } else {
+                return convertStreamToString(in);
+            }
         } else {
-            return convertStreamToString(in);
+            throw new ValidationException("Invalid value for filename '"
+                + fileName + "'");
         }
     }
 
     public static String convertStreamToString(@NotNull InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        if (is != null) {
+            java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+            return s.hasNext() ? s.next() : "";
+        } else {
+            throw new ValidationException("InputStream may not be null");
+        }
     }
 }

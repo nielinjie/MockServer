@@ -28,6 +28,8 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
 
 import org.apache.http.HttpHeaders;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.raml.model.ActionType;
 import org.raml.model.Raml;
 import org.raml.model.Resource;
@@ -97,10 +99,12 @@ public class MockServer {
      *            HTTP port on which mocket REST API can be reached.
      */
     void createMockServer(@NotNull Raml specification, @Min(0) int port,
-        String responseFiles) throws FileNotFoundException {
+        @NotNull @NotEmpty @NotBlank String responseFiles)
+        throws FileNotFoundException {
         WireMockServer wireMockServer = new WireMockServer(wireMockConfig()
             .port(port).withRootDirectory(responseFiles)
             .extensions(new MockResponses(specification, responseFiles)));
+
         wireMockServer.start();
 
         // Create stub returning info regarding mocked interfaces.
@@ -133,7 +137,7 @@ public class MockServer {
      *             if specification file could not be found.
      */
     @NotNull
-    Raml getSpecification(@NotNull String specificationFile)
+    Raml getSpecification(@NotNull @NotEmpty @NotBlank String specificationFile)
         throws FileNotFoundException {
         log.debug("Loading specification file '{}'", specificationFile);
         File file = new File(specificationFile);

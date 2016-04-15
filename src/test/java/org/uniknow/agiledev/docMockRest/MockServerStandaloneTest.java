@@ -37,12 +37,14 @@ public class MockServerStandaloneTest {
     }
 
     /**
-     * Verifies ValidationException is thrown in case argument specifying location responses is empty
+     * Verifies ValidationException is thrown in case argument specifying
+     * location responses is empty
      */
     @Test(expected = ValidationException.class)
     public void testStartServerWithResponsesLocationEmpty()
         throws FileNotFoundException {
-        MockServerStandalone.main(new String[] { "-r", "", "-p", "8080",
+        MockServerStandalone.main(new String[] { "-r",
+                "examples/specifications/example.raml", "-p", "8080",
                 "-responses", "" });
     }
 

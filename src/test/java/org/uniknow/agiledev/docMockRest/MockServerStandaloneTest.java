@@ -37,6 +37,17 @@ public class MockServerStandaloneTest {
     }
 
     /**
+     * Verifies FileNotFoundException is thrown in case argument referencing
+     * RAML specification file is referencing non existing file
+     */
+    @Test(expected = FileNotFoundException.class)
+    public void testStartServerWithSpecificationNotExisting()
+        throws FileNotFoundException {
+        MockServerStandalone.main(new String[] { "-r", "non-existing.raml",
+                "-p", "8080", "-responses", "responses-location" });
+    }
+
+    /**
      * Verifies ValidationException is thrown in case argument specifying
      * location responses is empty
      */

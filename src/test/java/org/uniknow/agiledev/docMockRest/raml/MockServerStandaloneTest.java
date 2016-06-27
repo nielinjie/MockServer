@@ -13,9 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.uniknow.agiledev.docMockRest;
+package org.uniknow.agiledev.docMockRest.raml;
 
 import org.junit.Test;
+import org.uniknow.agiledev.docMockRest.raml.MockServerStandalone;
 
 import javax.validation.ValidationException;
 import java.io.FileNotFoundException;

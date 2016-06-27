@@ -13,10 +13,11 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.uniknow.agiledev.docMockRest;
+package org.uniknow.agiledev.docMockRest.raml;
 
 import org.junit.Test;
 import org.raml.model.Raml;
+import org.uniknow.agiledev.docMockRest.raml.Raml2HtmlRenderer;
 
 import javax.validation.ValidationException;
 

@@ -13,10 +13,8 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.uniknow.agiledev.docMockRest;
+package org.uniknow.agiledev.docMockRest.raml;
 
-import org.everit.json.schema.Schema;
-import org.everit.json.schema.loader.SchemaLoader;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
@@ -25,22 +23,16 @@ import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.raml.model.Action;
 import org.raml.model.Raml;
-import org.raml.model.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
+import org.uniknow.agiledev.docMockRest.IoUtil;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.*;
 
 /**

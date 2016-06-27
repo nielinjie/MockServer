@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.uniknow.agiledev.docMockRest;
+package org.uniknow.agiledev.docMockRest.raml;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -24,6 +24,8 @@ import org.raml.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
+import org.uniknow.agiledev.docMockRest.HandlebarsFactory;
+import org.uniknow.agiledev.docMockRest.IoUtil;
 
 import javax.validation.constraints.NotNull;
 import java.io.FileNotFoundException;

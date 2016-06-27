@@ -13,18 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.uniknow.agiledev.docMockRest;
+package org.uniknow.agiledev.docMockRest.raml;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.Test;
 import org.raml.model.Raml;
-import org.raml.model.Resource;
+import org.uniknow.agiledev.docMockRest.raml.MockServer;
 
 import javax.validation.ValidationException;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;

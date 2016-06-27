@@ -302,7 +302,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.uniknow.agiledev.docMockRest.MockServerStandalone</mainClass>
+                            <mainClass>org.uniknow.agiledev.docMockRest.raml.MockServerStandalone</mainClass>
                         </manifest>
                     </archive>
                     <descriptors>

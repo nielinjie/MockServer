@@ -56,7 +56,7 @@ public class MockServerStandaloneTest {
     public void testStartServerWithResponsesLocationEmpty()
         throws FileNotFoundException {
         MockServerStandalone.main(new String[] { "-r",
-                "examples/specifications/example.raml", "-p", "8080",
+                "./../examples/specifications/example.raml", "-p", "8080",
                 "-responses", "" });
     }
 

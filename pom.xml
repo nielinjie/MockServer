@@ -20,12 +20,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.uniknow.agiledev</groupId>
-    <artifactId>DocMockRest</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>DocMockRest</name>
+    <groupId>org.uniknow.agiledev.docMockRest</groupId>
+    <artifactId>DocMockRest-Root</artifactId>
+    <version>0.0.2-SNAPSHOT</version>
+    <name>DocMockRest Root</name>
+    <packaging>pom</packaging>
     <description>
-        Framework for documenting and mocking REST API based on RAML specification file.
+        Root of framework for documenting and mocking REST API based on RAML specification file.
     </description>
 
     <scm>
@@ -73,8 +74,13 @@
         <dbc4java.version>0.1.13</dbc4java.version>
         <easymock.version>3.4</easymock.version>
         <jruby.version>1.7.24</jruby.version>
-
+        <junit.version>4.11</junit.version>
     </properties>
+
+    <modules>
+        <module>examples/swagger/annotation</module>
+        <module>core</module>
+    </modules>
 
     <dependencies>
         <!-- Start: Dependencies documentation -->
@@ -93,95 +99,165 @@
         </dependency>
         <!-- End: Dependencies documentation -->
 
-        <!-- Start: Test Dependencies -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>${easymock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- End: Test Dependencies -->
-
-        <!-- Start: Design by Contract dependencies-->
-        <dependency>
-            <groupId>org.uniknow.agiledev</groupId>
-            <artifactId>dbc4java</artifactId>
-            <version>${dbc4java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjrt</artifactId>
-            <version>${aspectj.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aspectj</groupId>
-            <artifactId>aspectjweaver</artifactId>
-            <version>${aspectj.version}</version>
-        </dependency>
-        <!-- End: Design by Contract dependencies-->
-
-        <!-- Start: Dependencies RAML2HTML converter -->
-        <dependency>
-            <groupId>com.github.jknack</groupId>
-            <artifactId>handlebars</artifactId>
-            <version>4.0.5</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.jknack</groupId>
-            <artifactId>handlebars-markdown</artifactId>
-            <version>4.0.5</version>
-        </dependency>
-        <!-- End: Dependencies RAML2HTML converter -->
-
-        <!-- Dependency for mocking API responses -->
-        <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock</artifactId>
-            <version>1.58</version>
-        </dependency>
-
-        <!-- Dependency for RAML -->
-        <dependency>
-            <groupId>org.raml</groupId>
-            <artifactId>raml-parser</artifactId>
-            <version>0.8.13</version>
-        </dependency>
-
-        <!-- Dependency for JSON Schema validation -->
-        <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-
-        <!-- Dependency for easily parsing java arguments -->
-        <dependency>
-            <groupId>net.sf.jopt-simple</groupId>
-            <artifactId>jopt-simple</artifactId>
-            <version>4.9</version>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.0.1</version>
-        </dependency>
-
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Start: Test Dependencies -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.easymock</groupId>
+                <artifactId>easymock</artifactId>
+                <version>${easymock.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- End: Test Dependencies -->
+
+            <!-- Start: Design by Contract dependencies-->
+            <dependency>
+                <groupId>org.uniknow.agiledev</groupId>
+                <artifactId>dbc4java</artifactId>
+                <version>${dbc4java.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjrt</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>${aspectj.version}</version>
+            </dependency>
+            <!-- End: Design by Contract dependencies-->
+
+            <!-- Start: Dependencies RAML2HTML converter -->
+            <dependency>
+                <groupId>com.github.jknack</groupId>
+                <artifactId>handlebars</artifactId>
+                <version>4.0.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.jknack</groupId>
+                <artifactId>handlebars-markdown</artifactId>
+                <version>4.0.5</version>
+            </dependency>
+            <!-- End: Dependencies RAML2HTML converter -->
+
+            <!-- Dependency for mocking API responses -->
+            <dependency>
+                <groupId>com.github.tomakehurst</groupId>
+                <artifactId>wiremock</artifactId>
+                <version>1.58</version>
+            </dependency>
+
+            <!-- Dependency for RAML -->
+            <dependency>
+                <groupId>org.raml</groupId>
+                <artifactId>raml-parser</artifactId>
+                <version>0.8.13</version>
+            </dependency>
+
+            <!-- START: Dependencies for Swagger -->
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-jaxrs</artifactId>
+                <version>1.5.6</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger</groupId>
+                <artifactId>swagger-parser</artifactId>
+                <version>1.0.16</version>
+            </dependency>
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>0.9.10</version>
+            </dependency>
+            <!-- END: Dependencies for Swagger -->
+
+            <!-- Dependency for JSON Schema validation -->
+            <dependency>
+                <groupId>org.everit.json</groupId>
+                <artifactId>org.everit.json.schema</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>3.0.1</version>
+            </dependency>
+
+            <!-- Dependency for easily parsing java arguments -->
+            <dependency>
+                <groupId>net.sf.jopt-simple</groupId>
+                <artifactId>jopt-simple</artifactId>
+                <version>4.9</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>javax.ws.rs-api</artifactId>
+                <version>2.0.1</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <!--
+                AspectJ compile time weaving. Required for Design by Contract
+                -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>aspectj-maven-plugin</artifactId>
+                    <version>1.7</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <showWeaveInfo>true</showWeaveInfo>
+                        <complianceLevel>${maven.compiler.target}</complianceLevel>
+
+                        <encoding>${project.build.sourceEncoding}</encoding>
+
+                        <weaveDependencies>
+                            <weaveDependency>
+                                <groupId>org.uniknow.agiledev</groupId>
+                                <artifactId>dbc4java</artifactId>
+                            </weaveDependency>
+                        </weaveDependencies>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.aspectj</groupId>
+                            <artifactId>aspectjrt</artifactId>
+                            <version>${aspectj.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.aspectj</groupId>
+                            <artifactId>aspectjtools</artifactId>
+                            <version>${aspectj.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
 
             <plugin>
@@ -216,28 +292,6 @@
                 </executions>
             </plugin>
 
-            <!--
-                Plugin for formatting java source files following specified
-                code conventions. The formatter is based on the eclipse
-                formatted and can use the exported xml formatting definitions
-            -->
-            <plugin>
-                <groupId>com.googlecode.maven-java-formatter-plugin
-                </groupId>
-                <artifactId>maven-java-formatter-plugin</artifactId>
-                <version>0.4</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <lineEnding>LF</lineEnding>
-                    <configFile>${project.basedir}/src/build-configuration/formatter/uniknow.xml</configFile>
-                </configuration>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -253,71 +307,6 @@
                 </configuration>
             </plugin>
 
-            <!--
-            AspectJ compile time weaving. Required for Design by Contract
-            -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>aspectj-maven-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <showWeaveInfo>true</showWeaveInfo>
-                    <complianceLevel>${maven.compiler.target}</complianceLevel>
-
-                    <encoding>${project.build.sourceEncoding}</encoding>
-
-                    <weaveDependencies>
-                        <weaveDependency>
-                            <groupId>org.uniknow.agiledev</groupId>
-                            <artifactId>dbc4java</artifactId>
-                        </weaveDependency>
-                    </weaveDependencies>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjrt</artifactId>
-                        <version>${aspectj.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.aspectj</groupId>
-                        <artifactId>aspectjtools</artifactId>
-                        <version>${aspectj.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>org.uniknow.agiledev.docMockRest.raml.MockServerStandalone</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptors>
-                        <descriptor>src/assembly/docMockRest.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
             <!-- START: plugins site documentation -->
             <plugin>

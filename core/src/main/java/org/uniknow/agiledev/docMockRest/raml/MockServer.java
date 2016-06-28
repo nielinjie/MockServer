@@ -43,6 +43,9 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.MediaType;
 
+/**
+ * Mock Server based on RAML specification
+ */
 @Validated
 public class MockServer {
     private final static Logger log = LoggerFactory.getLogger(MockServer.class);
@@ -97,6 +100,9 @@ public class MockServer {
      *            RAML specification
      * @param port
      *            HTTP port on which mocket REST API can be reached.
+     * @param responseFiles
+     *            Reference to location where responses for REST calls are
+     *            specified.
      */
     void createMockServer(@NotNull Raml specification, @Min(0) int port,
         @NotNull @NotEmpty @NotBlank String responseFiles)
@@ -209,10 +215,6 @@ public class MockServer {
     private void stubJsonBodyExampleWithCode(WireMockServer wireMockServer,
         Resource resource, String statusCode, ActionType actionType) {
         String resourceMatch = replaceResourceIdWithAnyMatcher(resource);
-        // log.debug("stub {},  status code: {} resourceMatch: {}",
-        // resource.getUri(),
-        // statusCode,
-        // resourceMatch);
 
         // TODO: Requires that content-type header is set, should check whether
         // that can be defined in RAML file (mediaTypeExtension).

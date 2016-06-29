@@ -25,6 +25,8 @@ The `-r` parameter specifies the location of the RAML file we want to mock. The 
 
 The structure of the response files matches the URI of the resources within the RAML file; eg, the response for `http://localhost:80/example` will be at `<location response files>/example/response.<content type>`. The extension of the response file will match the `content-type` of the resource. 
 
+To check which calls are mocked by the server you can invoke `http://localhost:80/__admin`
+
 ### Contribution guidelines ###
 
 * Writing tests

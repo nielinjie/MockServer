@@ -17,18 +17,28 @@ package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.junit.Stubbing;
+import com.github.tomakehurst.wiremock.stubbing.ListStubMappingsResult;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import io.swagger.jaxrs.Reader;
 import io.swagger.models.*;
+import io.swagger.models.parameters.Parameter;
+import io.swagger.models.parameters.PathParameter;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
+import org.uniknow.agiledev.docMockRest.SystemError;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.NotFoundException;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +53,21 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 public class MockServer {
 
     private final static Logger LOG = LoggerFactory.getLogger(MockServer.class);
+
+    /*
+     * Contains instance of created wire mock server
+     */
+    private WireMockServer wireMockServer;
+
+    /**
+     * Maps operation ID to matching stub
+     */
+    private final Map<String, MappingBuilder> stubs = new HashMap<>();
+
+    /*
+     * Contains Swagger configuration as mocked by this server
+     */
+    private Swagger specification;
 
     /**
      * Default constructor for testing purposes only
@@ -112,12 +137,13 @@ public class MockServer {
      *            HTTP port on which mocket REST API can be reached.
      */
     void createMockServer(@NotNull Swagger specification, @Min(0) int port) {
-        WireMockServer wireMockServer = new WireMockServer(wireMockConfig()
-            .port(port));
+        wireMockServer = new WireMockServer(wireMockConfig().port(port));
         wireMockServer.start();
 
+        this.specification = specification;
+
         // Create stubs for resources within specification
-        stubResources(wireMockServer, specification);
+        stubResources(specification);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -129,53 +155,93 @@ public class MockServer {
     }
 
     /**
+     * Returns stub for specified operation
+     * 
+     * @param operationID
+     *            Identifier of operation for which we want to retrieve Stub
+     * 
+     * @return Stub for specified operation
+     */
+    public MappingBuilder when(@NotNull @NotEmpty @NotBlank String operationID) {
+        // Get URL of operation
+        if (stubs.containsKey(operationID)) {
+            return stubs.get(operationID);
+        } else {
+            throw new NotFoundException(
+                "Specified operation could not be found");
+        }
+    }
+
+    /**
+     * Updates defintion for stub
+     */
+    public void stubFor(@NotNull MappingBuilder stub) {
+        wireMockServer.stubFor(stub);
+    }
+
+    /**
      * Stub the passed resources recursively.
      * 
-     * @param wireMockServer
-     *            Server that will be used to mock the resources
      * @param specification
      *            Swagger specification
      */
-    final void stubResources(@NotNull WireMockServer wireMockServer,
-        @NotNull Swagger specification) {
+    private void stubResources(Swagger specification) {
 
         for (Map.Entry<String, Path> paths : specification.getPaths()
             .entrySet()) {
             System.out.println("Processing resource " + paths.getKey());
-            stubResource(wireMockServer, paths.getKey(), paths.getValue());
+            stubResource(paths.getKey(), paths.getValue());
         }
 
     }
 
-    private void stubResource(WireMockServer wireMockServer, String url,
-        Path path) {
-        stubOperation(wireMockServer, HttpMethod.GET, url, path.getGet());
-        stubOperation(wireMockServer, HttpMethod.PUT, url, path.getPut());
-        stubOperation(wireMockServer, HttpMethod.POST, url, path.getPost());
-        stubOperation(wireMockServer, HttpMethod.DELETE, url, path.getDelete());
+    private void stubResource(String url, Path path) {
+        stubOperation(HttpMethod.GET, url, path.getGet());
+        stubOperation(HttpMethod.PUT, url, path.getPut());
+        stubOperation(HttpMethod.POST, url, path.getPost());
+        stubOperation(HttpMethod.DELETE, url, path.getDelete());
     }
 
-    private void stubOperation(WireMockServer wireMockServer,
-        HttpMethod method, String url, Operation operation) {
+    private void stubOperation(HttpMethod method, String url,
+        Operation operation) {
         if (operation != null) {
             System.out.println("Creating stub for [" + method + "]:" + url);
 
-            MappingBuilder urlMatcher;
+            // Replace path parameters in URL by proper regular expressions.
+            Map<String, String> pathParameters = new HashMap<>();
+            for (Parameter parameter : operation.getParameters()) {
+                System.out
+                    .println("Verifying parameter " + parameter.getName());
+                if (parameter.getIn().equalsIgnoreCase("path")) {
+                    System.out.println("Adding " + parameter.getName()
+                        + " to path parameters");
+                    PathParameter pathParameter = (PathParameter) parameter;
+                    pathParameters.put(parameter.getName(),
+                        pathParameter.getType());
+                }
+            }
+            for (String parameterName : pathParameters.keySet()) {
+                // TODO: Replace . (match any character) by proper regular
+                // expression based on type.
+                url = url.replace("{" + parameterName + "}", ".");
+            }
+
+            MappingBuilder stub;
             switch (method) {
             case GET:
-                urlMatcher = get(urlMatching(url));
+                stub = get(urlMatching(url));
                 break;
 
             case POST:
-                urlMatcher = post(urlMatching(url));
+                stub = post(urlMatching(url));
                 break;
 
             case PUT:
-                urlMatcher = put(urlMatching(url));
+                stub = put(urlMatching(url));
                 break;
 
             case DELETE:
-                urlMatcher = delete(urlMatching(url));
+                stub = delete(urlMatching(url));
                 break;
 
             default:
@@ -183,13 +249,18 @@ public class MockServer {
                 return;
             }
 
-            wireMockServer.stubFor(urlMatcher.willReturn(aResponse()
-                .withStatus(HttpStatus.SC_NO_CONTENT)));
+            // Add stub to dictionary for later retrieval
+            System.out.println("Adding stub for operation "
+                + operation.getOperationId());
+            stubs.put(operation.getOperationId(), stub);
+
+            // Create default stub for operation
+            wireMockServer.stubFor(stub.willReturn(aResponse()
+                .withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
+                .withHeader("Content-Type", "text/plain")
+                .withHeader("Cache-Control", "no-cache")
+                .withBody("No mocked response defined yet")));
         }
     }
-
-    /**
-     * Create response for Operation
-     */
 
 }

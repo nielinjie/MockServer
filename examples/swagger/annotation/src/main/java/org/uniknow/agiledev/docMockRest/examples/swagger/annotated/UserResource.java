@@ -77,7 +77,8 @@ public interface UserResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", responseContainer = "TEST"),
             @ApiResponse(code = 400, message = "Invalid username supplied"),
-            @ApiResponse(code = 404, message = "User not found") }) Response getUserByName(
+            @ApiResponse(code = 404, message = "User not found") })
+    Response getUserByName(
             @ApiParam(value = "The name that needs to be fetched. Use user1 for testing. ", required = true) @PathParam("username") String username);
 
     @GET

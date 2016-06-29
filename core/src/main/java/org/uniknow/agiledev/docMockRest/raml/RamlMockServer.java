@@ -47,13 +47,14 @@ import javax.ws.rs.core.MediaType;
  * Mock Server based on RAML specification
  */
 @Validated
-public class MockServer {
-    private final static Logger log = LoggerFactory.getLogger(MockServer.class);
+public class RamlMockServer {
+    private final static Logger log = LoggerFactory
+        .getLogger(RamlMockServer.class);
 
     /**
      * Default constructor for testing purposes only
      */
-    MockServer() {
+    RamlMockServer() {
     }
 
     /**
@@ -69,8 +70,8 @@ public class MockServer {
      * @throws FileNotFoundException
      *             if specification file doesn't exist
      */
-    public MockServer(String specificationFile, int port, String responseFiles)
-        throws FileNotFoundException {
+    public RamlMockServer(String specificationFile, int port,
+        String responseFiles) throws FileNotFoundException {
         log.info("Starting MockServer using RAML file: {} on port: {}",
             specificationFile, port);
 

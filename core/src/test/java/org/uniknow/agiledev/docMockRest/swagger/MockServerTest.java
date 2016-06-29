@@ -22,13 +22,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.easymock.Mock;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.junit.Assert.*;
@@ -38,11 +35,11 @@ import static org.junit.Assert.*;
  */
 public class MockServerTest {
 
-    private static MockServer server;
+    private static SwaggerMockServer server;
 
     @BeforeClass
     public static void init() {
-        server = new MockServer(
+        server = new SwaggerMockServer(
             "org.uniknow.agiledev.docMockRest.examples.swagger.annotated", 8080);
 
     }
@@ -85,8 +82,9 @@ public class MockServerTest {
         EntityUtils.consumeQuietly(response.getEntity());
 
         // Change response into 403
-        server.stubFor(server.when("logoutUser")
-            .willReturn(aResponse().withStatus(HttpStatus.SC_FORBIDDEN)));
+        server.stubFor(server.when("logoutUser").willReturn(
+            aResponse().withBody("Unauthorized access").withStatus(
+                HttpStatus.SC_FORBIDDEN)));
 
         // Verify response is now 403
         request = new HttpGet("http://localhost:8080/user/logout");

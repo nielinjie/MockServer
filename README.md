@@ -19,9 +19,9 @@ The [DocMockRest](http://uniknow.bitbucket.org/DocMockRest/) tool requires Java 
 
 The system can be started by executing the following instruction within the directory where the `DocMockRest-<version>-full.jar` exist:
  
-    java -jar DocMockRest-<version>-full.jar -r <RAML file> -p <Port Number> -responses <location response files>
+    java -jar DocMockRest-<version>-full.jar -raml <RAML file> || -swagger <package> -port <Port Number> -responses <location response files>
     
-The `-r` parameter specifies the location of the RAML file we want to mock. The `-p` parameter specifies the port on which the mocked API will run, and the `-responses` parameter specifies the location where the response files reside. 
+The `-raml` parameter specifies the location of the RAML file we want to mock. The `-port` parameter specifies the port on which the mocked API will run (default port 80), and the `-responses` parameter specifies the location where the response files reside.
 
 The structure of the response files matches the URI of the resources within the RAML file; eg, the response for `http://localhost:80/example` will be at `<location response files>/example/response.<content type>`. The extension of the response file will match the `content-type` of the resource. 
 

@@ -18,7 +18,6 @@ package org.uniknow.agiledev.docMockRest.raml;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.Test;
 import org.raml.model.Raml;
-import org.uniknow.agiledev.docMockRest.raml.MockServer;
 
 import javax.validation.ValidationException;
 
@@ -38,7 +37,7 @@ public class MockServerTest {
      */
     @Test(expected = ValidationException.class)
     public void testConstructorRamlFileNull() throws FileNotFoundException {
-        new MockServer(null, 0, "test");
+        new RamlMockServer(null, 0, "test");
     }
 
     /**
@@ -48,7 +47,7 @@ public class MockServerTest {
     @Test(expected = ValidationException.class)
     public void testCreateMockServerPortNumberBelowZero()
         throws FileNotFoundException {
-        MockServer server = new MockServer();
+        RamlMockServer server = new RamlMockServer();
         Raml model = createMock(Raml.class);
         replay(model);
 
@@ -61,7 +60,7 @@ public class MockServerTest {
     @Test(expected = ValidationException.class)
     public void testCreateMockServerSpecificationNull()
         throws FileNotFoundException {
-        MockServer server = new MockServer();
+        RamlMockServer server = new RamlMockServer();
 
         server.createMockServer(null, 1, "test");
     }
@@ -72,7 +71,7 @@ public class MockServerTest {
      */
     @Test(expected = ValidationException.class)
     public void stubResourcesNull() {
-        MockServer server = new MockServer();
+        RamlMockServer server = new RamlMockServer();
         WireMockServer mockServer = createMock(WireMockServer.class);
         replay(mockServer);
 
@@ -84,7 +83,7 @@ public class MockServerTest {
      */
     @Test(expected = ValidationException.class)
     public void stubResourcesMockServerNull() {
-        MockServer server = new MockServer();
+        RamlMockServer server = new RamlMockServer();
 
         server.stubResources(null, new ArrayList<>());
     }

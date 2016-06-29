@@ -17,29 +17,21 @@ package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
-import com.github.tomakehurst.wiremock.junit.Stubbing;
-import com.github.tomakehurst.wiremock.stubbing.ListStubMappingsResult;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import io.swagger.jaxrs.Reader;
 import io.swagger.models.*;
 import io.swagger.models.parameters.Parameter;
 import io.swagger.models.parameters.PathParameter;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
-import org.uniknow.agiledev.docMockRest.SystemError;
 
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,9 +42,10 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
  * Mock Server based on Swagger specification
  */
 @Validated
-public class MockServer {
+public class SwaggerMockServer {
 
-    private final static Logger LOG = LoggerFactory.getLogger(MockServer.class);
+    private final static Logger LOG = LoggerFactory
+        .getLogger(SwaggerMockServer.class);
 
     /*
      * Contains instance of created wire mock server
@@ -72,20 +65,25 @@ public class MockServer {
     /**
      * Default constructor for testing purposes only
      */
-    MockServer() {
+    SwaggerMockServer() {
+        this(80);
     }
 
     /**
-     * Constructor Mock Server
-     * 
-     * @param specificationFile
-     *            Location of file containing Swagger definition on which mocks
-     *            will be based
-     * @param port
-     *            Port on which mock server will be reachable.
+     * Creates instance of MockServer listening on speficied port
      */
-    MockServer(File specificationFile, int port) {
-        // TODO
+    public SwaggerMockServer(int port) {
+        LOG.info("Starting MockServer listening on port <>", port);
+        wireMockServer = new WireMockServer(wireMockConfig().port(port));
+        wireMockServer.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                LOG.info("Shutting down the mock server");
+                wireMockServer.shutdown();
+            }
+        });
     }
 
     /**
@@ -96,14 +94,14 @@ public class MockServer {
      * @param port
      *            Port on which mock server will be reachable.
      */
-    MockServer(String prefix, int port) {
-        LOG.info(
-            "Starting MockServer using annotated classes within: {} on port: {}",
-            prefix, port);
+    public SwaggerMockServer(String prefix, int port) {
+        this(port);
 
+        // Create Swagger specification based on annotated classes
         Swagger specification = getSpecification(prefix);
 
-        createMockServer(specification, port);
+        // Create stubs for operations within specification
+        createStubs(specification);
     }
 
     /**
@@ -115,10 +113,16 @@ public class MockServer {
      * @return Swagger specification
      */
     private Swagger getSpecification(String prefix) {
+        LOG.info("Create swagger model based on annotated classes within {}",
+            prefix);
+        System.out
+            .println("Create swagger model based on annotated classes within "
+                + prefix);
 
         // Get all swagger annotated classes within specified package
         SwaggerAnnotationScanner scanner = new SwaggerAnnotationScanner();
         Set<Class<?>> resources = scanner.getResources(prefix);
+        System.out.println("Found annotated classes are " + resources);
 
         // Read all annotated classes and create rest specifications
         Swagger swagger = null;
@@ -129,29 +133,30 @@ public class MockServer {
     }
 
     /**
+     * Reset mock server removing all previously defined stubs
+     */
+    public void reset() {
+        stubs.clear();
+
+        wireMockServer.resetMappings();
+        wireMockServer.resetRequests();
+        wireMockServer.resetScenarios();
+    }
+
+    /**
      * Creates server mocking REST APIs which are specified within swagger model
      * 
      * @param specification
      *            Swagger specification
-     * @param port
-     *            HTTP port on which mocket REST API can be reached.
      */
-    void createMockServer(@NotNull Swagger specification, @Min(0) int port) {
-        wireMockServer = new WireMockServer(wireMockConfig().port(port));
-        wireMockServer.start();
+    void createStubs(@NotNull Swagger specification) {
+        // Remove any previously defined stubs
+        reset();
 
         this.specification = specification;
 
         // Create stubs for resources within specification
         stubResources(specification);
-
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                LOG.info("Shutting down the mock server");
-                wireMockServer.shutdown();
-            }
-        });
     }
 
     /**
@@ -180,19 +185,24 @@ public class MockServer {
     }
 
     /**
-     * Stub the passed resources recursively.
+     * Stub the operations as specified within specification.
      * 
      * @param specification
      *            Swagger specification
      */
     private void stubResources(Swagger specification) {
 
-        for (Map.Entry<String, Path> paths : specification.getPaths()
-            .entrySet()) {
-            System.out.println("Processing resource " + paths.getKey());
-            stubResource(paths.getKey(), paths.getValue());
+        if (specification.getPaths() != null
+            && !specification.getPaths().isEmpty()) {
+            for (Map.Entry<String, Path> paths : specification.getPaths()
+                .entrySet()) {
+                System.out.println("Processing operation(s) at path "
+                    + paths.getKey());
+                stubResource(paths.getKey(), paths.getValue());
+            }
+        } else {
+            LOG.warn("No operations found. Make sure that the annotated classes are on the classpath of the server.");
         }
-
     }
 
     private void stubResource(String url, Path path) {

@@ -23,6 +23,9 @@ import joptsimple.OptionSpec;
 
 import java.io.FileNotFoundException;
 
+/**
+ * @deprecated Replaced by org.uniknow.agiledev.docMockRest.MockServerStandalone
+ */
 public class MockServerStandalone {
 
     /**
@@ -49,7 +52,7 @@ public class MockServerStandalone {
 
         OptionSet options = parser.parse(args);
 
-        new MockServer(ramlfile.value(options), port.value(options),
+        new RamlMockServer(ramlfile.value(options), port.value(options),
             responseFiles.value(options));
     }
 }

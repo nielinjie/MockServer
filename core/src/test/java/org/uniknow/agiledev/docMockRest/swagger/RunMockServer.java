@@ -23,7 +23,7 @@ import java.io.FileNotFoundException;
 public class RunMockServer {
 
     public static void main(String[] args) throws FileNotFoundException {
-        new MockServer(
+        new SwaggerMockServer(
             "org.uniknow.agiledev.docMockRest.examples.swagger.annotated", 8080);
     }
 }

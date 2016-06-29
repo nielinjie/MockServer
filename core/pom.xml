@@ -95,7 +95,8 @@
             <groupId>org.uniknow.agiledev.docMockRest</groupId>
             <artifactId>example-swagger-annotated</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <!-- Temporary removed scope to test mock server as standalone -->
+            <!--<scope>test</scope>-->
         </dependency>
 
 
@@ -218,7 +219,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.uniknow.agiledev.docMockRest.raml.MockServerStandalone</mainClass>
+                            <mainClass>org.uniknow.agiledev.docMockRest.MockServerStandalone</mainClass>
                         </manifest>
                     </archive>
                     <descriptors>

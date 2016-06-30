@@ -5,6 +5,7 @@
 [DocMockRest](http://uniknow.bitbucket.org/DocMockRest/) is a simple standalone server to mock RESTful API services specified by a RAML specification file or by swagger annotated classes. This system allows you to quickly define a REST API and have them return JSON, XML or any other type of response.
 
 *TODO:*
+
 * Mocked services based on swagger annotated classes are currently returning always HTTP status `501`. This response (and the body) can be changed programmatically via the exposed Java API. Instead of this it should be checked whether examples are provided and if so use those. Questions that need to be addressed is what should be done if multiple examples are provided.
 * Currently path parameters are replaced by regular expression that accepts any character. Instead of this the type of the parameter should be checked and based on that the proper regular expression should be inserted in the URL.
 

@@ -17,6 +17,10 @@ package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.common.FileSource;
+import com.github.tomakehurst.wiremock.core.ConfigurationException;
+import com.github.tomakehurst.wiremock.matching.RequestPattern;
+import com.github.tomakehurst.wiremock.standalone.JsonFileMappingsLoader;
 import io.swagger.jaxrs.Reader;
 import io.swagger.models.*;
 import io.swagger.models.parameters.Parameter;
@@ -28,12 +32,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
 
+import javax.annotation.RegEx;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -56,6 +62,11 @@ public class SwaggerMockServer {
      * Maps operation ID to matching stub
      */
     private final Map<String, MappingBuilder> stubs = new HashMap<>();
+
+    /**
+     * Maps Request expression to matching Operation
+     */
+    private final Map<String, Operation> operations = new HashMap<>();
 
     /*
      * Contains Swagger configuration as mocked by this server
@@ -100,8 +111,25 @@ public class SwaggerMockServer {
         // Create Swagger specification based on annotated classes
         Swagger specification = getSpecification(prefix);
 
-        // Create stubs for operations within specification
+        // Create default stubs for operations within specification
         createStubs(specification);
+    }
+
+    /**
+     * Constructor Mock Server
+     *
+     * @param prefix
+     *            Package that need to be scanned for annotated classes
+     * @param port
+     *            Port on which mock server will be reachable.
+     * @param responseFile
+     * File containing responses for stubs
+     */
+    public SwaggerMockServer(String prefix, int port, String responseFile) {
+        this(prefix,port);
+
+        FileSource source = null;
+        wireMockServer.loadMappingsUsing(new JsonFileMappingsLoader(source));
     }
 
     /**
@@ -178,10 +206,33 @@ public class SwaggerMockServer {
     }
 
     /**
-     * Updates defintion for stub
+     * Updates definition for stub
      */
     public void stubFor(@NotNull MappingBuilder stub) {
-        wireMockServer.stubFor(stub);
+        // Check whether operation exist for specified mapping
+        RequestPattern request = stub.build().getRequest();
+        if (operationExist(request)) {
+            wireMockServer.stubFor(stub);
+        } else {
+            throw new ConfigurationException("Operation you attempt to stub (" + request + ")is not specified in specs");
+        }
+    }
+
+    /**
+     * Verifies operation exist for specified request
+     *
+     * @param request Request we want to stub
+     *
+     * @return true if operation exist, false otherwise.
+     */
+    private boolean operationExist(RequestPattern request) {
+        String requestExpression = request.getMethod() +":" + request.getUrl();
+
+        for (String urlExpression : operations.keySet()) {
+            System.out.println(urlExpression + " matches " + requestExpression + "=" +
+            Pattern.matches(urlExpression, requestExpression));
+        }
+        return true;
     }
 
     /**
@@ -230,6 +281,8 @@ public class SwaggerMockServer {
                         pathParameter.getType());
                 }
             }
+
+            // Replace path parameter place holders by regular expression.
             for (String parameterName : pathParameters.keySet()) {
                 // TODO: Replace . (match any character) by proper regular
                 // expression based on type.
@@ -263,6 +316,11 @@ public class SwaggerMockServer {
             System.out.println("Adding stub for operation "
                 + operation.getOperationId());
             stubs.put(operation.getOperationId(), stub);
+
+            // Add operation to dictionary for later retrieval
+            String urlExpression = method + ":" + url;
+            System.out.println("Adding operation " + operation.getOperationId() + " for URL expression " + urlExpression);
+            operations.put(urlExpression,operation);
 
             // Create default stub for operation
             wireMockServer.stubFor(stub.willReturn(aResponse()

@@ -16,6 +16,9 @@
 package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.http.RequestMethod;
+import com.github.tomakehurst.wiremock.matching.RequestPattern;
+import io.swagger.models.Operation;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -28,6 +31,8 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.Assert.*;
 
 /**
@@ -74,7 +79,7 @@ public class MockServerTest {
     public void testModifyingResponseStubbedOperation() throws IOException {
         HttpClient client = new DefaultHttpClient();
 
-        // Verify default response is 204
+        // Verify default response is 501
         HttpGet request = new HttpGet("http://localhost:8080/user/logout");
         HttpResponse response = client.execute(request);
         assertEquals(HttpStatus.SC_NOT_IMPLEMENTED, response.getStatusLine()
@@ -92,6 +97,15 @@ public class MockServerTest {
         assertEquals(HttpStatus.SC_FORBIDDEN, response.getStatusLine()
             .getStatusCode());
         EntityUtils.consumeQuietly(response.getEntity());
+    }
 
+    /**
+     * Verifies Operation for mocked stub can be retrieved successfully
+     */
+    @Test
+    public void testGetOperationByStub() {
+        Operation operation = server.getOperation(new RequestPattern(
+            RequestMethod.GET, "/user/test"));
+        assertNotNull(operation);
     }
 }

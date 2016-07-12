@@ -117,16 +117,16 @@ public class SwaggerMockServer {
 
     /**
      * Constructor Mock Server
-     *
+     * 
      * @param prefix
      *            Package that need to be scanned for annotated classes
      * @param port
      *            Port on which mock server will be reachable.
      * @param responseFile
-     * File containing responses for stubs
+     *            File containing responses for stubs
      */
     public SwaggerMockServer(String prefix, int port, String responseFile) {
-        this(prefix,port);
+        this(prefix, port);
 
         FileSource source = null;
         wireMockServer.loadMappingsUsing(new JsonFileMappingsLoader(source));
@@ -211,28 +211,44 @@ public class SwaggerMockServer {
     public void stubFor(@NotNull MappingBuilder stub) {
         // Check whether operation exist for specified mapping
         RequestPattern request = stub.build().getRequest();
-        if (operationExist(request)) {
+        if (operationExist(stub)) {
             wireMockServer.stubFor(stub);
         } else {
-            throw new ConfigurationException("Operation you attempt to stub (" + request + ")is not specified in specs");
+            throw new ConfigurationException("Operation you attempt to stub ("
+                + request + ")is not specified in specs");
         }
     }
 
     /**
-     * Verifies operation exist for specified request
-     *
-     * @param request Request we want to stub
-     *
-     * @return true if operation exist, false otherwise.
+     * Returns Operation that matches the specified request
+     * 
+     * @return matching operation or null.
      */
-    private boolean operationExist(RequestPattern request) {
-        String requestExpression = request.getMethod() +":" + request.getUrl();
+    public Operation getOperation(@NotNull RequestPattern request) {
+
+        String requestExpression = request.getMethod()
+            + ":"
+            + (request.getUrl() == null ? request.getUrlPattern() : request
+                .getUrl());
 
         for (String urlExpression : operations.keySet()) {
-            System.out.println(urlExpression + " matches " + requestExpression + "=" +
-            Pattern.matches(urlExpression, requestExpression));
+            System.out.println(urlExpression + " matches " + requestExpression
+                + "=" + Pattern.matches(urlExpression, requestExpression));
+            if (Pattern.matches(urlExpression, requestExpression)) {
+                return operations.get(urlExpression);
+            }
         }
-        return true;
+
+        return null;
+    }
+
+    /**
+     * Verifies operation exist for specified request
+     * 
+     * @return true if operation exist, false otherwise.
+     */
+    private boolean operationExist(MappingBuilder stub) {
+        return getOperation(stub.build().getRequest()) != null;
     }
 
     /**
@@ -286,7 +302,7 @@ public class SwaggerMockServer {
             for (String parameterName : pathParameters.keySet()) {
                 // TODO: Replace . (match any character) by proper regular
                 // expression based on type.
-                url = url.replace("{" + parameterName + "}", ".");
+                url = url.replace("{" + parameterName + "}", ".*");
             }
 
             MappingBuilder stub;
@@ -319,8 +335,9 @@ public class SwaggerMockServer {
 
             // Add operation to dictionary for later retrieval
             String urlExpression = method + ":" + url;
-            System.out.println("Adding operation " + operation.getOperationId() + " for URL expression " + urlExpression);
-            operations.put(urlExpression,operation);
+            System.out.println("Adding operation " + operation.getOperationId()
+                + " for URL expression " + urlExpression);
+            operations.put(urlExpression, operation);
 
             // Create default stub for operation
             wireMockServer.stubFor(stub.willReturn(aResponse()

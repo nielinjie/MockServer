@@ -148,14 +148,11 @@ public class SwaggerMockServer {
     private Swagger getSpecification(String prefix) {
         LOG.info("Create swagger model based on annotated classes within {}",
             prefix);
-        System.out
-            .println("Create swagger model based on annotated classes within "
-                + prefix);
 
         // Get all swagger annotated classes within specified package
         SwaggerAnnotationScanner scanner = new SwaggerAnnotationScanner();
         Set<Class<?>> resources = scanner.getResources(prefix);
-        System.out.println("Found annotated classes are " + resources);
+        LOG.debug("Found annotated classes are {}", resources);
 
         // Read all annotated classes and create rest specifications
         Swagger swagger = null;
@@ -237,13 +234,12 @@ public class SwaggerMockServer {
                 .getUrl());
 
         for (String urlExpression : operations.keySet()) {
-            System.out.println(urlExpression + " matches " + requestExpression
-                + "=" + Pattern.matches(urlExpression, requestExpression));
             if (Pattern.matches(urlExpression, requestExpression)) {
                 return operations.get(urlExpression);
             }
         }
 
+        LOG.debug("No matching operation found for {}", requestExpression);
         return null;
     }
 
@@ -268,8 +264,7 @@ public class SwaggerMockServer {
             && !specification.getPaths().isEmpty()) {
             for (Map.Entry<String, Path> paths : specification.getPaths()
                 .entrySet()) {
-                System.out.println("Processing operation(s) at path "
-                    + paths.getKey());
+                LOG.debug("Processing operation(s) at path {}", paths.getKey());
                 stubResource(paths.getKey(), paths.getValue());
             }
         } else {
@@ -287,7 +282,7 @@ public class SwaggerMockServer {
     private void stubOperation(HttpMethod method, String url,
         Operation operation) {
         if (operation != null) {
-            System.out.println("Creating stub for [" + method + "]:" + url);
+            LOG.info("Creating stub for [{}]:{}" + method, url);
 
             // Replace path parameter place holders by regular expression.
             // TODO: Replace . (match any character) by proper regular
@@ -313,19 +308,18 @@ public class SwaggerMockServer {
                 break;
 
             default:
-                LOG.warn("[" + method + "]" + url + " is not supported yet");
+                LOG.warn("[{}]:{} is not supported yet", method, url);
                 return;
             }
 
             // Add stub to dictionary for later retrieval
-            System.out.println("Adding stub for operation "
-                + operation.getOperationId());
+            LOG.info("Adding stub for operation {}", operation.getOperationId());
             stubs.put(operation.getOperationId(), stub);
 
             // Add operation to dictionary for later retrieval
             String urlExpression = method + ":" + url;
-            System.out.println("Adding operation " + operation.getOperationId()
-                + " for URL expression " + urlExpression);
+            LOG.info("Adding operation {} for URL expression {}",
+                operation.getOperationId(), urlExpression);
             operations.put(urlExpression, operation);
 
             // Create default stub for operation

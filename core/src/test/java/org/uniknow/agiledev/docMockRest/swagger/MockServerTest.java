@@ -28,6 +28,7 @@ import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.validation.ValidationException;
 import java.io.IOException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
@@ -107,5 +108,23 @@ public class MockServerTest {
         Operation operation = server.getOperation(new RequestPattern(
             RequestMethod.GET, "/user/test"));
         assertNotNull(operation);
+    }
+
+    /**
+     * Verifies exception is thrown in case passed request pattern is null
+     */
+    @Test(expected = ValidationException.class)
+    public void testGetOperationByStubRequestNull() {
+        server.getOperation(null);
+    }
+
+    /**
+     * Verifies null is returned for non existing operation/stub
+     */
+    @Test
+    public void testGetNonExistingOperation() {
+        assertNull(server.getOperation(new RequestPattern(RequestMethod.GET,
+            "/nonexisting/operation")));
+
     }
 }

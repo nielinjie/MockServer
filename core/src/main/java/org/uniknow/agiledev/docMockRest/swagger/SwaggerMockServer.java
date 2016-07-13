@@ -17,31 +17,35 @@ package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
-import com.github.tomakehurst.wiremock.common.FileSource;
 import com.github.tomakehurst.wiremock.core.ConfigurationException;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
-import com.github.tomakehurst.wiremock.standalone.JsonFileMappingsLoader;
 import io.swagger.jaxrs.Reader;
-import io.swagger.models.*;
-import io.swagger.models.parameters.Parameter;
-import io.swagger.models.parameters.PathParameter;
+import io.swagger.models.HttpMethod;
+import io.swagger.models.Operation;
+import io.swagger.models.Path;
+import io.swagger.models.Swagger;
 import org.apache.http.HttpStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
+import org.uniknow.agiledev.docMockRest.JsonResponsesMappingsLoader;
 
-import javax.annotation.RegEx;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
-
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.delete;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 /**
@@ -125,11 +129,12 @@ public class SwaggerMockServer {
      * @param responseFile
      *            File containing responses for stubs
      */
-    public SwaggerMockServer(String prefix, int port, String responseFile) {
+    public SwaggerMockServer(String prefix, int port, String responseFile)
+        throws IOException {
         this(prefix, port);
 
-        FileSource source = null;
-        wireMockServer.loadMappingsUsing(new JsonFileMappingsLoader(source));
+        wireMockServer.loadMappingsUsing(new JsonResponsesMappingsLoader(this,
+            responseFile));
     }
 
     /**
@@ -284,26 +289,10 @@ public class SwaggerMockServer {
         if (operation != null) {
             System.out.println("Creating stub for [" + method + "]:" + url);
 
-            // Replace path parameters in URL by proper regular expressions.
-            Map<String, String> pathParameters = new HashMap<>();
-            for (Parameter parameter : operation.getParameters()) {
-                System.out
-                    .println("Verifying parameter " + parameter.getName());
-                if (parameter.getIn().equalsIgnoreCase("path")) {
-                    System.out.println("Adding " + parameter.getName()
-                        + " to path parameters");
-                    PathParameter pathParameter = (PathParameter) parameter;
-                    pathParameters.put(parameter.getName(),
-                        pathParameter.getType());
-                }
-            }
-
             // Replace path parameter place holders by regular expression.
-            for (String parameterName : pathParameters.keySet()) {
-                // TODO: Replace . (match any character) by proper regular
-                // expression based on type.
-                url = url.replace("{" + parameterName + "}", ".*");
-            }
+            // TODO: Replace . (match any character) by proper regular
+            // expression based on type.
+            url = url.replaceAll("\\{.*\\}", ".*");
 
             MappingBuilder stub;
             switch (method) {

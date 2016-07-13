@@ -23,6 +23,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
@@ -125,6 +126,27 @@ public class MockServerTest {
     public void testGetNonExistingOperation() {
         assertNull(server.getOperation(new RequestPattern(RequestMethod.GET,
             "/nonexisting/operation")));
+    }
+
+    /**
+     * Initiates a MockServer reading response file
+     */
+    @Test
+    public void initiateServerWithResponseFile() throws IOException {
+        // Find responses file on classpath
+        String responseFileLocation = this.getClass()
+            .getResource("responses.json").getFile();
+        SwaggerMockServer serverWithResponse = new SwaggerMockServer(
+            "org.uniknow.agiledev.docMockRest.swagger", 9090,
+            responseFileLocation);
+
+        // Verify correct result is returned
+        HttpClient client = new DefaultHttpClient();
+        HttpGet request = new HttpGet("http://localhost:9090/HelloWorld/TEST");
+        HttpResponse response = client.execute(request);
+        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
+        assertEquals("Hello TEST",
+            new BasicResponseHandler().handleResponse(response));
 
     }
 }

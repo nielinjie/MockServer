@@ -34,6 +34,6 @@ public interface ExampleRestApi {
     @GET
     @ApiOperation(value = "Hello World example.", response = String.class)
     @Path("/{name}")
-    @Produces("application/text")
+    @Produces("text/plain")
     Response hello(String name);
 }

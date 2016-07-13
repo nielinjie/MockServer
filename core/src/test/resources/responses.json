@@ -1,0 +1,15 @@
+[
+  {
+    "request": {
+      "method": "GET",
+      "url": "/HelloWorld/TEST"
+    },
+    "response": {
+      "status": 200,
+      "body": "Hello TEST",
+      "headers": {
+        "Content-Type": "text/plain"
+      }
+    }
+  }
+]

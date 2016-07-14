@@ -17,13 +17,16 @@ package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
 import com.github.tomakehurst.wiremock.core.ConfigurationException;
+import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
 import io.swagger.jaxrs.Reader;
 import io.swagger.models.HttpMethod;
 import io.swagger.models.Operation;
 import io.swagger.models.Path;
 import io.swagger.models.Swagger;
+import io.swagger.models.parameters.Parameter;
 import org.apache.http.HttpStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -43,6 +46,7 @@ import java.util.regex.Pattern;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.matching;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
@@ -70,7 +74,7 @@ public class SwaggerMockServer {
     /**
      * Maps Request expression to matching Operation
      */
-    private final Map<String, Operation> operations = new HashMap<>();
+    private final Map<RequestPattern, Operation> operations = new HashMap<>();
 
     /*
      * Contains Swagger configuration as mocked by this server
@@ -142,7 +146,6 @@ public class SwaggerMockServer {
      * 
      * @param prefix
      *            Package that need to be scanned for annotated classes
-     * 
      * @return Swagger specification
      */
     private Swagger getSpecification(String prefix) {
@@ -194,7 +197,6 @@ public class SwaggerMockServer {
      * 
      * @param operationID
      *            Identifier of operation for which we want to retrieve Stub
-     * 
      * @return Stub for specified operation
      */
     public MappingBuilder when(@NotNull @NotEmpty @NotBlank String operationID) {
@@ -228,18 +230,20 @@ public class SwaggerMockServer {
      */
     public Operation getOperation(@NotNull RequestPattern request) {
 
-        String requestExpression = request.getMethod()
-            + ":"
-            + (request.getUrl() == null ? request.getUrlPattern() : request
-                .getUrl());
+        String requestUrl = request.getUrl() == null ? request.getUrlPattern()
+            : request.getUrl();
 
-        for (String urlExpression : operations.keySet()) {
-            if (Pattern.matches(urlExpression, requestExpression)) {
-                return operations.get(urlExpression);
+        // Find Operation that matches the specified Request
+        for (RequestPattern genericRequest : operations.keySet()) {
+            if (genericRequest.getMethod() == request.getMethod()
+                && Pattern.matches(genericRequest.getUrlPathPattern(),
+                    requestUrl)) {
+                // if (urlExpression.isMatchedBy(request)) {
+                return operations.get(genericRequest);
             }
         }
 
-        LOG.debug("No matching operation found for {}", requestExpression);
+        LOG.debug("No matching operation found for {}", request);
         return null;
     }
 
@@ -283,6 +287,21 @@ public class SwaggerMockServer {
         Operation operation) {
         if (operation != null) {
             LOG.info("Creating stub for [{}]:{}", method, url);
+            System.out.println("Creating stub for [" + method + "]:" + url);
+
+            // // Replace path parameters in URL by proper regular expressions.
+            // Map<String, String> pathParameters = new HashMap<>();
+            // for (Parameter parameter : operation.getParameters()) {
+            // System.out
+            // .println("Verifying parameter " + parameter.getName());
+            // if (parameter.getIn().equalsIgnoreCase("path")) {
+            // System.out.println("Adding " + parameter.getName()
+            // + " to path parameters");
+            // PathParameter pathParameter = (PathParameter) parameter;
+            // pathParameters.put(parameter.getName(),
+            // pathParameter.getType());
+            // }
+            // }
 
             // Replace path parameter place holders by regular expression.
             // TODO: Replace . (match any character) by proper regular
@@ -312,23 +331,68 @@ public class SwaggerMockServer {
                 return;
             }
 
+            // TODO: Add matching of query parameters and/or headers
+            for (Parameter parameter : operation.getParameters()) {
+                LOG.debug("Processing parameter {}", parameter.getIn());
+                if (parameter.getRequired()) {
+                    if (parameter.getIn().equalsIgnoreCase("query")) {
+                        stub.withQueryParam(parameter.getName(),
+                            matching(createRegularExpression(parameter
+                                .getPattern())));
+                    }
+                }
+            }
+
+            // Create default response for stub
+            stub.willReturn(aResponse()
+                .withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
+                .withHeader("Content-Type", "text/plain")
+                .withHeader("Cache-Control", "no-cache")
+                .withBody("No mocked response defined yet"));
+
             // Add stub to dictionary for later retrieval
             LOG.info("Adding stub for operation {}", operation.getOperationId());
             stubs.put(operation.getOperationId(), stub);
 
             // Add operation to dictionary for later retrieval
-            String urlExpression = method + ":" + url;
-            LOG.info("Adding operation {} for URL expression {}",
-                operation.getOperationId(), urlExpression);
-            operations.put(urlExpression, operation);
+            // TODO: Instead of creating own key, use request pattern
+            // String urlExpression = method + ":" + url;
+            RequestPattern request = stub.build().getRequest();
+            LOG.info("Adding operation {} for request {}",
+                operation.getOperationId(), request);
+            operations.put(request, operation);
 
             // Create default stub for operation
-            wireMockServer.stubFor(stub.willReturn(aResponse()
-                .withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
-                .withHeader("Content-Type", "text/plain")
-                .withHeader("Cache-Control", "no-cache")
-                .withBody("No mocked response defined yet")));
+            wireMockServer.stubFor(stub);
+
+            // wireMockServer.stubFor(stub.willReturn(aResponse()
+            // .withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
+            // .withHeader("Content-Type", "text/plain")
+            // .withHeader("Cache-Control", "no-cache")
+            // .withBody("No mocked response defined yet")));
         }
     }
 
+    /**
+     * Create regular expression for matching any value of specific instance
+     * type
+     */
+    private String createRegularExpression(String type) {
+        return ".*";
+    }
+
+    // /**
+    // * Creates `RequestPattern` based on passed REST operation.
+    // *
+    // * @param operation
+    // * REST operation
+    // *
+    // * @return RequestPattern for passed operation
+    // */
+    // private RequestPattern createRequestPattern(HttpMethod method, String
+    // url,
+    // Operation operation) {
+    // RequestPatternBuilder builder = new RequestPatternBuilder(method, url)
+    // return null;
+    // }
 }

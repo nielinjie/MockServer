@@ -20,7 +20,9 @@ import io.swagger.annotations.ApiOperation;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.xml.ws.Response;
 
 /**
@@ -35,5 +37,12 @@ public interface ExampleRestApi {
     @ApiOperation(value = "Hello World example.", response = String.class)
     @Path("/{name}")
     @Produces("text/plain")
-    Response hello(String name);
+    Response hello(@PathParam("name") String name);
+
+    @GET
+    @ApiOperation(value = "Goodbye example", response = String.class)
+    @Path("/goodbye")
+    @Produces("text/plain")
+    Response goodbye(@QueryParam("name") String name);
+
 }

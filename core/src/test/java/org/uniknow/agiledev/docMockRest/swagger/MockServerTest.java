@@ -61,17 +61,29 @@ public class MockServerTest {
     }
 
     /**
-     * Verifies default response for stubbed operation is 204
+     * Verifies default response for stubbed operation is 501
      */
     @Test
     public void testInvokeStubbedOperationWithNoResponseDefined()
         throws IOException {
         HttpClient client = new DefaultHttpClient();
-        HttpGet request = new HttpGet("http://localhost:8080/user/x");
-        HttpResponse response = client.execute(request);
+        HttpGet request;
+        HttpResponse response;
 
+        // Check proper response is returned for operation with path parameter
+        request = new HttpGet("http://localhost:8080/user/x");
+        response = client.execute(request);
         assertEquals(HttpStatus.SC_NOT_IMPLEMENTED, response.getStatusLine()
             .getStatusCode());
+        EntityUtils.consumeQuietly(response.getEntity());
+
+        // Check proper response is returned for operation with query parameters
+        request = new HttpGet(
+            "http://localhost:8080/user/login?username=test&password=test");
+        response = client.execute(request);
+        assertEquals(HttpStatus.SC_NOT_IMPLEMENTED, response.getStatusLine()
+            .getStatusCode());
+        EntityUtils.consumeQuietly(response.getEntity());
     }
 
     /**
@@ -149,4 +161,5 @@ public class MockServerTest {
             new BasicResponseHandler().handleResponse(response));
 
     }
+
 }

@@ -282,7 +282,7 @@ public class SwaggerMockServer {
     private void stubOperation(HttpMethod method, String url,
         Operation operation) {
         if (operation != null) {
-            LOG.info("Creating stub for [{}]:{}" + method, url);
+            LOG.info("Creating stub for [{}]:{}", method, url);
 
             // Replace path parameter place holders by regular expression.
             // TODO: Replace . (match any character) by proper regular

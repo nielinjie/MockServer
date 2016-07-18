@@ -237,9 +237,9 @@ public class SwaggerMockServer {
         RequestPatternMatcher matcher = new RequestPatternMatcher();
 
         // Find Operation that matches the specified Request
-        for (RequestPattern genericRequest : operations.keySet()) {
-            if (matcher.match(genericRequest, request)) {
-                return operations.get(genericRequest);
+        for (RequestPattern spec : operations.keySet()) {
+            if (matcher.match(spec, request)) {
+                return operations.get(spec);
             }
         }
 

@@ -235,9 +235,8 @@ public class SwaggerMockServer {
 
         // Find Operation that matches the specified Request
         for (RequestPattern genericRequest : operations.keySet()) {
-            if (genericRequest.getMethod() == request.getMethod()
-                && Pattern.matches(genericRequest.getUrlPathPattern(),
-                    requestUrl)) {
+            if (genericRequest.getMethod().equals(request.getMethod())
+                && Pattern.matches(genericRequest.getUrlPattern(), requestUrl)) {
                 // if (urlExpression.isMatchedBy(request)) {
                 return operations.get(genericRequest);
             }

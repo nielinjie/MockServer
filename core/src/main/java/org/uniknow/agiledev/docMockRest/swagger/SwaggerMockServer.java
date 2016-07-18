@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
 import org.uniknow.agiledev.docMockRest.JsonResponsesMappingsLoader;
+import org.uniknow.agiledev.docMockRest.RequestPatternMatcher;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
@@ -233,11 +234,11 @@ public class SwaggerMockServer {
         String requestUrl = request.getUrl() == null ? request.getUrlPattern()
             : request.getUrl();
 
+        RequestPatternMatcher matcher = new RequestPatternMatcher();
+
         // Find Operation that matches the specified Request
         for (RequestPattern genericRequest : operations.keySet()) {
-            if (genericRequest.getMethod().equals(request.getMethod())
-                && Pattern.matches(genericRequest.getUrlPattern(), requestUrl)) {
-                // if (urlExpression.isMatchedBy(request)) {
+            if (matcher.match(genericRequest, request)) {
                 return operations.get(genericRequest);
             }
         }

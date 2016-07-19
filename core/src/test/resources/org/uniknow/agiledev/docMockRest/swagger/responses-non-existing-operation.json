@@ -2,11 +2,11 @@
   {
     "request": {
       "method": "GET",
-      "url": "/HelloWorld/TEST"
+      "url": "/NonExistingOperation/TEST"
     },
     "response": {
       "status": 200,
-      "body": "Hello TEST",
+      "body": "Non existing operation",
       "headers": {
         "Content-Type": "text/plain"
       }

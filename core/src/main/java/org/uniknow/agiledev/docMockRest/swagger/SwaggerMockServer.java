@@ -93,7 +93,7 @@ public class SwaggerMockServer {
      * Creates instance of MockServer listening on speficied port
      */
     public SwaggerMockServer(int port) {
-        LOG.info("Starting MockServer listening on port <>", port);
+        LOG.info("Starting MockServer listening on port {}", port);
         wireMockServer = new WireMockServer(wireMockConfig().port(port));
         wireMockServer.start();
 
@@ -138,6 +138,7 @@ public class SwaggerMockServer {
         throws IOException {
         this(prefix, port);
 
+        LOG.info("Loading responses of {}", responseFile);
         wireMockServer.loadMappingsUsing(new JsonResponsesMappingsLoader(this,
             responseFile));
     }
@@ -288,7 +289,6 @@ public class SwaggerMockServer {
         if (operation != null) {
             LOG.info("Creating stub for [{}]:{}", method, url);
             System.out.println("Creating stub for [" + method + "]:" + url);
-
 
             // Replace path parameter place holders by regular expression.
             // TODO: Replace . (match any character) by proper regular

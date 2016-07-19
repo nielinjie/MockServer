@@ -28,6 +28,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.uniknow.agiledev.docMockRest.SystemError;
 
 import javax.validation.ValidationException;
 import java.io.IOException;
@@ -148,6 +149,8 @@ public class MockServerTest {
         // Find responses file on classpath
         String responseFileLocation = this.getClass()
             .getResource("responses.json").getFile();
+
+        // Initiate mock server
         SwaggerMockServer serverWithResponse = new SwaggerMockServer(
             "org.uniknow.agiledev.docMockRest.swagger", 9090,
             responseFileLocation);
@@ -159,6 +162,23 @@ public class MockServerTest {
         assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
         assertEquals("Hello TEST",
             new BasicResponseHandler().handleResponse(response));
+
+    }
+
+    /**
+     * Initiates a MockServer reading responses for non existing operations
+     */
+    @Test(expected = SystemError.class)
+    public void initiateServerWithResponseFileContainingNonExistingOperations()
+        throws IOException {
+        // Find responses file on classpath
+        String responseFileLocation = this.getClass()
+            .getResource("responses-non-existing-operation.json").getFile();
+
+        // Initiate mock server
+        SwaggerMockServer serverWithResponse = new SwaggerMockServer(
+            "org.uniknow.agiledev.docMockRest.swagger", 7070,
+            responseFileLocation);
 
     }
 

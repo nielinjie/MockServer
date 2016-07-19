@@ -289,19 +289,6 @@ public class SwaggerMockServer {
             LOG.info("Creating stub for [{}]:{}", method, url);
             System.out.println("Creating stub for [" + method + "]:" + url);
 
-            // // Replace path parameters in URL by proper regular expressions.
-            // Map<String, String> pathParameters = new HashMap<>();
-            // for (Parameter parameter : operation.getParameters()) {
-            // System.out
-            // .println("Verifying parameter " + parameter.getName());
-            // if (parameter.getIn().equalsIgnoreCase("path")) {
-            // System.out.println("Adding " + parameter.getName()
-            // + " to path parameters");
-            // PathParameter pathParameter = (PathParameter) parameter;
-            // pathParameters.put(parameter.getName(),
-            // pathParameter.getType());
-            // }
-            // }
 
             // Replace path parameter place holders by regular expression.
             // TODO: Replace . (match any character) by proper regular
@@ -365,11 +352,6 @@ public class SwaggerMockServer {
             // Create default stub for operation
             wireMockServer.stubFor(stub);
 
-            // wireMockServer.stubFor(stub.willReturn(aResponse()
-            // .withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
-            // .withHeader("Content-Type", "text/plain")
-            // .withHeader("Cache-Control", "no-cache")
-            // .withBody("No mocked response defined yet")));
         }
     }
 

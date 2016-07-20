@@ -348,6 +348,11 @@
                 <artifactId>reflections</artifactId>
                 <version>0.9.10</version>
             </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>2.6.0</version>
+            </dependency>
             <!-- END: Dependencies for Swagger -->
 
             <!-- Dependency for JSON Schema validation -->

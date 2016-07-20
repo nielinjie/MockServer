@@ -100,7 +100,7 @@
         </dependency>
 
 
-    <!-- End: Test Dependencies -->
+        <!-- End: Test Dependencies -->
 
         <!-- Start: Design by Contract dependencies-->
         <dependency>
@@ -246,6 +246,10 @@
             <artifactId>joda-time</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

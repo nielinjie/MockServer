@@ -16,24 +16,34 @@
 package org.uniknow.agiledev.docMockRest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import com.github.tomakehurst.wiremock.standalone.MappingsLoader;
 import com.github.tomakehurst.wiremock.stubbing.JsonStubMappingCreator;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.github.tomakehurst.wiremock.stubbing.StubMappings;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.docMockRest.swagger.SwaggerMockServer;
 
-import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * Class responsible for loading responses in json file
  */
 public class JsonResponsesMappingsLoader implements MappingsLoader {
 
+    private final static Logger LOG = LoggerFactory
+        .getLogger(SwaggerMockServer.class);
+
     /*
      * Contains location of file containing stub responses
      */
-    private final String locationResponsesFile;
+    private final InputStream locationResponsesFile;
 
     /**
      * TODO: Make it RAML/SWAGGER independent.
@@ -47,8 +57,18 @@ public class JsonResponsesMappingsLoader implements MappingsLoader {
      *            Location of file containing stub responses.
      */
     public JsonResponsesMappingsLoader(SwaggerMockServer mockServer,
-        String locationResponsesFile) {
-        this.locationResponsesFile = locationResponsesFile;
+        String locationResponsesFile) throws FileNotFoundException {
+        this(mockServer, new FileInputStream(locationResponsesFile));
+    }
+
+    public JsonResponsesMappingsLoader(SwaggerMockServer mockServer,
+        URL locationResponsesFile) throws IOException {
+        this(mockServer, locationResponsesFile.openStream());
+    }
+
+    public JsonResponsesMappingsLoader(SwaggerMockServer mockServer,
+        InputStream responsesFile) {
+        this.locationResponsesFile = responsesFile;
         this.mockServer = mockServer;
     }
 
@@ -60,12 +80,35 @@ public class JsonResponsesMappingsLoader implements MappingsLoader {
 
         try {
             ObjectMapper mapper = new ObjectMapper();
-            StubMapping[] mappings = mapper.readValue(new File(
-                locationResponsesFile), StubMapping[].class);
+            StubMapping[] mappings = mapper.readValue(locationResponsesFile,
+                StubMapping[].class);
 
             for (StubMapping mapping : mappings) {
                 // Check whether operation exist for specified stub response
                 if (mockServer.getOperation(mapping.getRequest()) != null) {
+
+                    // When body file specified load response and put in body.
+                    // Reason for this is that responses are within jar and
+                    // wiremock is not able to handle those correctly
+                    ResponseDefinition response = mapping.getResponse();
+                    if (response != null && response.getBodyFileName() != null) {
+                        URL locationResponseBodyFile = getClass()
+                            .getClassLoader().getResource(
+                                response.getBodyFileName());
+                        if (locationResponseBodyFile != null) {
+                            LOG.debug("Reading response body from {}",
+                                locationResponseBodyFile);
+                            response
+                                .setBody(IOUtils
+                                    .toString(locationResponseBodyFile
+                                        .openStream()));
+                            response.setBodyFileName(null);
+                        } else {
+                            throw new SystemError("Can't find body file "
+                                + response.getBodyFileName());
+                        }
+                    }
+
                     stubMappings.addMapping(mapping);
                 } else {
                     throw new SystemError(

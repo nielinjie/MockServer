@@ -39,6 +39,9 @@ import org.uniknow.agiledev.docMockRest.RequestPatternMatcher;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -141,6 +144,35 @@ public class SwaggerMockServer {
         LOG.info("Loading responses of {}", responseFile);
         wireMockServer.loadMappingsUsing(new JsonResponsesMappingsLoader(this,
             responseFile));
+    }
+
+    /**
+     * Constructor Mock Server
+     * 
+     * @param prefix
+     *            Package that need to be scanned for annotated classes
+     * @param port
+     *            Port on which mock server will be reachable.
+     * @param responseFile
+     *            File containing responses for stubs
+     */
+    public SwaggerMockServer(String prefix, int port, URL responseFile)
+        throws IOException {
+        this(prefix, port);
+
+        LOG.info("Loading responses of {}", responseFile);
+        wireMockServer.loadMappingsUsing(new JsonResponsesMappingsLoader(this,
+            responseFile));
+    }
+
+    /**
+     * Gracefully shutdown the server.
+     * 
+     * This method assumes it is being called as the result of an incoming HTTP
+     * request.
+     */
+    public void shutdown() {
+        wireMockServer.shutdown();
     }
 
     /**

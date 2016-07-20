@@ -146,22 +146,31 @@ public class MockServerTest {
      */
     @Test
     public void initiateServerWithResponseFile() throws IOException {
-        // Find responses file on classpath
-        String responseFileLocation = this.getClass()
-            .getResource("responses.json").getFile();
+        SwaggerMockServer serverWithResponse = null;
+        try {
+            // Find responses file on classpath
+            String responseFileLocation = this.getClass()
+                .getResource("responses.json").getFile();
 
-        // Initiate mock server
-        SwaggerMockServer serverWithResponse = new SwaggerMockServer(
-            "org.uniknow.agiledev.docMockRest.swagger", 9090,
-            responseFileLocation);
+            // Initiate mock server
+            serverWithResponse = new SwaggerMockServer(
+                "org.uniknow.agiledev.docMockRest.swagger", 9090,
+                responseFileLocation);
 
-        // Verify correct result is returned
-        HttpClient client = new DefaultHttpClient();
-        HttpGet request = new HttpGet("http://localhost:9090/HelloWorld/TEST");
-        HttpResponse response = client.execute(request);
-        assertEquals(HttpStatus.SC_OK, response.getStatusLine().getStatusCode());
-        assertEquals("Hello TEST",
-            new BasicResponseHandler().handleResponse(response));
+            // Verify correct result is returned
+            HttpClient client = new DefaultHttpClient();
+            HttpGet request = new HttpGet(
+                "http://localhost:9090/HelloWorld/TEST");
+            HttpResponse response = client.execute(request);
+            assertEquals(HttpStatus.SC_OK, response.getStatusLine()
+                .getStatusCode());
+            assertEquals("Hello TEST",
+                new BasicResponseHandler().handleResponse(response));
+        } finally {
+            if (serverWithResponse != null) {
+                serverWithResponse.shutdown();
+            }
+        }
 
     }
 
@@ -171,15 +180,22 @@ public class MockServerTest {
     @Test(expected = SystemError.class)
     public void initiateServerWithResponseFileContainingNonExistingOperations()
         throws IOException {
-        // Find responses file on classpath
-        String responseFileLocation = this.getClass()
-            .getResource("responses-non-existing-operation.json").getFile();
+        SwaggerMockServer serverWithResponse = null;
 
-        // Initiate mock server
-        SwaggerMockServer serverWithResponse = new SwaggerMockServer(
-            "org.uniknow.agiledev.docMockRest.swagger", 7070,
-            responseFileLocation);
+        try {
+            // Find responses file on classpath
+            String responseFileLocation = this.getClass()
+                .getResource("responses-non-existing-operation.json").getFile();
 
+            // Initiate mock server
+            serverWithResponse = new SwaggerMockServer(
+                "org.uniknow.agiledev.docMockRest.swagger", 7070,
+                responseFileLocation);
+        } finally {
+            if (serverWithResponse != null) {
+                serverWithResponse.shutdown();
+            }
+        }
     }
 
 }

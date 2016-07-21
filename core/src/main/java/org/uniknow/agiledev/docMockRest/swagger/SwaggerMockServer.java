@@ -363,11 +363,12 @@ public class SwaggerMockServer {
             }
 
             // Create default response for stub
-            stub.willReturn(aResponse()
-                .withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
-                .withHeader("Content-Type", "text/plain")
-                .withHeader("Cache-Control", "no-cache")
-                .withBody("No mocked response defined yet"));
+            stub.willReturn(
+                aResponse().withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
+                    .withHeader("Content-Type", "text/plain")
+                    .withHeader("Cache-Control", "no-cache")
+                    .withBody("No mocked response defined yet")).atPriority(
+                Integer.MAX_VALUE);
 
             // Add stub to dictionary for later retrieval
             LOG.info("Adding stub for operation {}", operation.getOperationId());

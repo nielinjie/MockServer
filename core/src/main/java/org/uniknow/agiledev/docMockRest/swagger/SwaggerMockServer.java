@@ -100,13 +100,13 @@ public class SwaggerMockServer {
         wireMockServer = new WireMockServer(wireMockConfig().port(port));
         wireMockServer.start();
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                LOG.info("Shutting down the mock server");
-                wireMockServer.shutdown();
-            }
-        });
+        // Runtime.getRuntime().addShutdownHook(new Thread() {
+        // @Override
+        // public void run() {
+        // LOG.info("Shutting down the mock server");
+        // wireMockServer.shutdown();
+        // }
+        // });
     }
 
     /**
@@ -172,6 +172,7 @@ public class SwaggerMockServer {
      * request.
      */
     public void shutdown() {
+        LOG.info("Shutdown mock server");
         wireMockServer.shutdown();
     }
 

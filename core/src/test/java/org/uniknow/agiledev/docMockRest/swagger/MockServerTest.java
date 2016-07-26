@@ -32,6 +32,7 @@ import org.uniknow.agiledev.docMockRest.SystemError;
 
 import javax.validation.ValidationException;
 import java.io.IOException;
+import java.net.Socket;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -196,6 +197,25 @@ public class MockServerTest {
                 serverWithResponse.shutdown();
             }
         }
+    }
+
+    @Test
+    public void testShutdown() throws InterruptedException {
+        // TODO: generate random port
+        SwaggerMockServer server = new SwaggerMockServer(5050);
+        assertTrue(serverAvailable("127.0.0.1", 5050));
+        server.shutdown();
+        Thread.sleep(1000);
+        assertFalse(serverAvailable("127.0.0.1", 5050));
+    }
+
+    private boolean serverAvailable(String serverAddress, int port) {
+        try (Socket s = new Socket(serverAddress, port)) {
+            return true;
+        } catch (IOException ex) {
+            /* ignore */
+        }
+        return false;
     }
 
 }

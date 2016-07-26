@@ -515,6 +515,29 @@
                         </dependency>
                     </dependencies>
                 </plugin>
+
+                <!-- Plugin to measure code coverage -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.7.201606060606</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>generate-coverage-report</id>
+                            <phase>prepare-package</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -593,6 +616,7 @@
                     </execution>
                 </executions>
             </plugin>
+
 
             <!-- START: plugins site documentation -->
             <plugin>

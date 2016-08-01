@@ -112,7 +112,8 @@ public class JsonResponsesMappingsLoader implements MappingsLoader {
                     stubMappings.addMapping(mapping);
                 } else {
                     throw new SystemError(
-                        "Attempting to create stub for non existing operation");
+                        "Attempting to create stub for non existing operation ('"
+                            + mapping.getRequest() + "')");
                 }
             }
         } catch (IOException error) {

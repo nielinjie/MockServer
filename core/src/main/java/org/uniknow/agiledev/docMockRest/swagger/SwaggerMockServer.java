@@ -325,8 +325,12 @@ public class SwaggerMockServer {
 
             // Replace path parameter place holders by regular expression.
             // TODO: Replace . (match any character) by proper regular
-            // expression based on type.
+            // expression based on type parameter.
             url = url.replaceAll("\\{.*\\}", ".*");
+
+            // Make sure that url also matches requests including query
+            // parameters
+            url = url + "(\\?.*)?";
 
             MappingBuilder stub;
             switch (method) {

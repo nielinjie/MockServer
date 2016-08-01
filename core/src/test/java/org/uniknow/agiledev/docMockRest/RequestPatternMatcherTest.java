@@ -16,8 +16,8 @@
 package org.uniknow.agiledev.docMockRest;
 
 import com.github.tomakehurst.wiremock.http.RequestMethod;
+import com.github.tomakehurst.wiremock.matching.MultiValuePattern;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
-import com.github.tomakehurst.wiremock.matching.ValuePattern;
 import org.junit.Test;
 
 import javax.validation.ValidationException;
@@ -113,7 +113,7 @@ public class RequestPatternMatcherTest {
     public void testMatchingRequestPatternsMatchingUrls() {
         RequestPattern first = mock(RequestPattern.class);
         expect(first.getMethod()).andReturn(RequestMethod.GET);
-        expect(first.getUrlPattern()).andReturn("/test/.*").times(2);
+        expect(first.getUrlPattern()).andReturn("/test/.*").times(1);
         expect(first.getQueryParameters()).andReturn(null);
         expect(first.getHeaders()).andReturn(null);
 
@@ -139,12 +139,12 @@ public class RequestPatternMatcherTest {
      */
     @Test
     public void testMatchingRequestPatternsMismatchQueryParameters() {
-        Map<String, ValuePattern> requestParameters = new HashMap<>();
-        requestParameters.put("TEST", mock(ValuePattern.class));
+        Map<String, MultiValuePattern> requestParameters = new HashMap<>();
+        requestParameters.put("TEST", mock(MultiValuePattern.class));
 
         RequestPattern first = mock(RequestPattern.class);
         expect(first.getMethod()).andReturn(RequestMethod.GET);
-        expect(first.getUrlPattern()).andReturn("/test/.*").times(2);
+        expect(first.getUrlPattern()).andReturn("/test/.*").times(1);
         expect(first.getQueryParameters()).andReturn(requestParameters);
 
         RequestPattern second = mock(RequestPattern.class);
@@ -170,12 +170,12 @@ public class RequestPatternMatcherTest {
      */
     @Test
     public void testMatchingRequestPatternsWithQueryParameters() {
-        Map<String, ValuePattern> requestParameters = new HashMap<>();
-        requestParameters.put("TEST", mock(ValuePattern.class));
+        Map<String, MultiValuePattern> requestParameters = new HashMap<>();
+        requestParameters.put("TEST", mock(MultiValuePattern.class));
 
         RequestPattern first = mock(RequestPattern.class);
         expect(first.getMethod()).andReturn(RequestMethod.GET);
-        expect(first.getUrlPattern()).andReturn("/test/.*").times(2);
+        expect(first.getUrlPattern()).andReturn("/test/.*").times(1);
         expect(first.getQueryParameters()).andReturn(requestParameters);
         expect(first.getHeaders()).andReturn(null);
 
@@ -202,12 +202,12 @@ public class RequestPatternMatcherTest {
      */
     @Test
     public void testMatchingRequestPatternsWithHeaders() {
-        Map<String, ValuePattern> headers = new HashMap<>();
-        headers.put("TEST", mock(ValuePattern.class));
+        Map<String, MultiValuePattern> headers = new HashMap<>();
+        headers.put("TEST", mock(MultiValuePattern.class));
 
         RequestPattern first = mock(RequestPattern.class);
         expect(first.getMethod()).andReturn(RequestMethod.GET);
-        expect(first.getUrlPattern()).andReturn("/test/.*").times(2);
+        expect(first.getUrlPattern()).andReturn("/test/.*").times(1);
         expect(first.getQueryParameters()).andReturn(null);
         expect(first.getHeaders()).andReturn(headers);
 

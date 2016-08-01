@@ -17,9 +17,12 @@ package org.uniknow.agiledev.docMockRest.raml;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.common.FileSource;
+import com.github.tomakehurst.wiremock.extension.Parameters;
 import com.github.tomakehurst.wiremock.extension.ResponseTransformer;
 import com.github.tomakehurst.wiremock.http.ContentTypeHeader;
+import com.github.tomakehurst.wiremock.http.HttpHeader;
 import com.github.tomakehurst.wiremock.http.Request;
+import com.github.tomakehurst.wiremock.http.Response;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
@@ -94,60 +97,60 @@ public class MockResponses extends ResponseTransformer {
         return responseExtenstion;
     }
 
-    /**
-     * TODO
-     * 
-     * @param request
-     * @param responseDefinition
-     * @param fileSource
-     * @return
-     */
-    @Override
-    public ResponseDefinition transform(Request request,
-        ResponseDefinition responseDefinition, FileSource fileSource) {
-        // TODO: Check whether there is reponse defined for request if not use
-        // passed response definition.
-        LOG.debug("Processing request for '{}'", request.getUrl());
-
-        if (pathResponseFiles != null) {
-            // Determine extension of response file
-            String responseExtenstion = getExtensionResponseFile(request);
-
-            // Check whether response for specific request is defined
-            Path pathResponseFile = Paths.get(pathResponseFiles,
-                request.getUrl(), "response." + responseExtenstion);
-            if (Files.exists(pathResponseFile)) {
-                LOG.debug("Response defined for '{}' : {}", request.getUrl(),
-                    pathResponseFile);
-                try {
-                    InputStream in = Files.newInputStream(pathResponseFile);
-                    String response = IoUtil.convertStreamToString(in);
-
-                    return ResponseDefinitionBuilder.like(responseDefinition)
-                        .but().withBody(response).build();
-
-                } catch (IOException error) {
-                    return ResponseDefinitionBuilder
-                        .like(responseDefinition)
-                        .but()
-                        .withHeader(HttpHeaders.CONTENT_TYPE,
-                            MediaType.TEXT_PLAIN).withBody(error.getMessage())
-                        .build();
-
-                }
-            }
-        }
-
-        if (responseDefinition.getBody() != null) {
-            return ResponseDefinitionBuilder.like(responseDefinition).build();
-        } else {
-            return ResponseDefinitionBuilder.like(responseDefinition).but()
-                .withStatus(HttpStatus.SC_NOT_FOUND)
-                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
-                .withBody("No mocked response found for " + request.getUrl())
-                .build();
-        }
-    }
+    // /**
+    // * TODO
+    // *
+    // * @param request
+    // * @param responseDefinition
+    // * @param fileSource
+    // * @return
+    // */
+    // @Override
+    // public ResponseDefinition transform(Request request,
+    // ResponseDefinition responseDefinition, FileSource fileSource) {
+    // // TODO: Check whether there is reponse defined for request if not use
+    // // passed response definition.
+    // LOG.debug("Processing request for '{}'", request.getUrl());
+    //
+    // if (pathResponseFiles != null) {
+    // // Determine extension of response file
+    // String responseExtenstion = getExtensionResponseFile(request);
+    //
+    // // Check whether response for specific request is defined
+    // Path pathResponseFile = Paths.get(pathResponseFiles,
+    // request.getUrl(), "response." + responseExtenstion);
+    // if (Files.exists(pathResponseFile)) {
+    // LOG.debug("Response defined for '{}' : {}", request.getUrl(),
+    // pathResponseFile);
+    // try {
+    // InputStream in = Files.newInputStream(pathResponseFile);
+    // String response = IoUtil.convertStreamToString(in);
+    //
+    // return ResponseDefinitionBuilder.like(responseDefinition)
+    // .but().withBody(response).build();
+    //
+    // } catch (IOException error) {
+    // return ResponseDefinitionBuilder
+    // .like(responseDefinition)
+    // .but()
+    // .withHeader(HttpHeaders.CONTENT_TYPE,
+    // MediaType.TEXT_PLAIN).withBody(error.getMessage())
+    // .build();
+    //
+    // }
+    // }
+    // }
+    //
+    // if (responseDefinition.getBody() != null) {
+    // return ResponseDefinitionBuilder.like(responseDefinition).build();
+    // } else {
+    // return ResponseDefinitionBuilder.like(responseDefinition).but()
+    // .withStatus(HttpStatus.SC_NOT_FOUND)
+    // .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+    // .withBody("No mocked response found for " + request.getUrl())
+    // .build();
+    // }
+    // }
 
     /**
      * Validates response that will be returned
@@ -183,8 +186,60 @@ public class MockResponses extends ResponseTransformer {
     }
 
     @Override
-    public String name() {
-        return "mock-responses";
+    public Response transform(Request request, Response response,
+        FileSource fileSource, Parameters parameters) {
+        LOG.debug("Processing request for '{}'", request.getUrl());
+
+        if (pathResponseFiles != null) {
+            // Determine extension of response file
+            String responseExtenstion = getExtensionResponseFile(request);
+
+            // Check whether response for specific request is defined
+            Path pathResponseFile = Paths.get(pathResponseFiles,
+                request.getUrl(), "response." + responseExtenstion);
+            if (Files.exists(pathResponseFile)) {
+                LOG.debug("Response defined for '{}' : {}", request.getUrl(),
+                    pathResponseFile);
+                try {
+                    InputStream in = Files.newInputStream(pathResponseFile);
+                    String responseContent = IoUtil.convertStreamToString(in);
+
+                    return Response.Builder.like(response).but()
+                        .body(responseContent).build();
+
+                } catch (IOException error) {
+                    return Response.Builder
+                        .like(response)
+                        .but()
+                        .headers(
+                            new com.github.tomakehurst.wiremock.http.HttpHeaders(
+                                new HttpHeader(HttpHeaders.CONTENT_TYPE,
+                                    MediaType.TEXT_PLAIN)))
+                        .body(error.getMessage()).build();
+
+                }
+            }
+        }
+
+        if (response.getBody() != null) {
+            return response;
+        } else {
+            return Response.Builder
+                .like(response)
+                .but()
+                .status(HttpStatus.SC_NOT_FOUND)
+                .headers(
+                    new com.github.tomakehurst.wiremock.http.HttpHeaders(
+                        new HttpHeader(HttpHeaders.CONTENT_TYPE,
+                            MediaType.TEXT_PLAIN)))
+                .body("No mocked response found for " + request.getUrl())
+                .build();
+        }
+
     }
 
+    @Override
+    public String getName() {
+        return "mock-responses";
+    }
 }

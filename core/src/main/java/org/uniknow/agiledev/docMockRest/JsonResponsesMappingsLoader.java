@@ -16,9 +16,9 @@
 package org.uniknow.agiledev.docMockRest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.http.ResponseDefinition;
 import com.github.tomakehurst.wiremock.standalone.MappingsLoader;
-import com.github.tomakehurst.wiremock.stubbing.JsonStubMappingCreator;
 import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import com.github.tomakehurst.wiremock.stubbing.StubMappings;
 import org.apache.commons.io.IOUtils;
@@ -75,8 +75,9 @@ public class JsonResponsesMappingsLoader implements MappingsLoader {
     @Override
     public void loadMappingsInto(StubMappings stubMappings) throws SystemError {
 
-        JsonStubMappingCreator jsonStubMappingCreator = new JsonStubMappingCreator(
-            stubMappings);
+        // JsonStubMappingCreator jsonStubMappingCreator = new
+        // JsonStubMappingCreator(
+        // stubMappings);
 
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -96,13 +97,14 @@ public class JsonResponsesMappingsLoader implements MappingsLoader {
                             .getClassLoader().getResource(
                                 response.getBodyFileName());
                         if (locationResponseBodyFile != null) {
-                            LOG.debug("Reading response body from {}",
+                            LOG.info("Reading response body from {}",
                                 locationResponseBodyFile);
-                            response
-                                .setBody(IOUtils
-                                    .toString(locationResponseBodyFile
-                                        .openStream()));
-                            response.setBodyFileName(null);
+                            mapping.setResponse(ResponseDefinitionBuilder
+                                .like(response)
+                                .withBody(
+                                    IOUtils.toString(locationResponseBodyFile
+                                        .openStream())).withBodyFile(null)
+                                .build());
                         } else {
                             throw new SystemError("Can't find body file "
                                 + response.getBodyFileName());

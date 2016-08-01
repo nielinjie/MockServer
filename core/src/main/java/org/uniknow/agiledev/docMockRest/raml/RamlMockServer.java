@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.MappingBuilder;
 
+import com.github.tomakehurst.wiremock.client.RemoteMappingBuilder;
 import org.apache.http.HttpHeaders;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -219,7 +219,7 @@ public class RamlMockServer {
 
         // TODO: Requires that content-type header is set, should check whether
         // that can be defined in RAML file (mediaTypeExtension).
-        MappingBuilder urlMatcher;
+        RemoteMappingBuilder urlMatcher;
         switch (actionType) {
 
         case GET:

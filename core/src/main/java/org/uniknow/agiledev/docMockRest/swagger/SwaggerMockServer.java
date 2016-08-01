@@ -16,10 +16,10 @@
 package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.MappingBuilder;
-import com.github.tomakehurst.wiremock.client.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.client.LocalMappingBuilder;
+import com.github.tomakehurst.wiremock.client.RemoteMappingBuilder;
+import com.github.tomakehurst.wiremock.client.WireMockMappingBuilder;
 import com.github.tomakehurst.wiremock.core.ConfigurationException;
-import com.github.tomakehurst.wiremock.http.Request;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
 import io.swagger.jaxrs.Reader;
 import io.swagger.models.HttpMethod;
@@ -39,13 +39,10 @@ import org.uniknow.agiledev.docMockRest.RequestPatternMatcher;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.delete;
@@ -73,7 +70,7 @@ public class SwaggerMockServer {
     /**
      * Maps operation ID to matching stub
      */
-    private final Map<String, MappingBuilder> stubs = new HashMap<>();
+    private final Map<String, RemoteMappingBuilder> stubs = new HashMap<>();
 
     /**
      * Maps Request expression to matching Operation
@@ -234,7 +231,8 @@ public class SwaggerMockServer {
      *            Identifier of operation for which we want to retrieve Stub
      * @return Stub for specified operation
      */
-    public MappingBuilder when(@NotNull @NotEmpty @NotBlank String operationID) {
+    public RemoteMappingBuilder when(
+        @NotNull @NotEmpty @NotBlank String operationID) {
         // Get URL of operation
         if (stubs.containsKey(operationID)) {
             return stubs.get(operationID);
@@ -247,7 +245,7 @@ public class SwaggerMockServer {
     /**
      * Updates definition for stub
      */
-    public void stubFor(@NotNull MappingBuilder stub) {
+    public void stubFor(@NotNull RemoteMappingBuilder stub) {
         // Check whether operation exist for specified mapping
         RequestPattern request = stub.build().getRequest();
         if (operationExist(stub)) {
@@ -286,7 +284,7 @@ public class SwaggerMockServer {
      * 
      * @return true if operation exist, false otherwise.
      */
-    private boolean operationExist(MappingBuilder stub) {
+    private boolean operationExist(RemoteMappingBuilder stub) {
         return getOperation(stub.build().getRequest()) != null;
     }
 
@@ -332,7 +330,7 @@ public class SwaggerMockServer {
             // parameters
             url = url + "(\\?.*)?";
 
-            MappingBuilder stub;
+            RemoteMappingBuilder stub;
             switch (method) {
             case GET:
                 stub = get(urlMatching(url));

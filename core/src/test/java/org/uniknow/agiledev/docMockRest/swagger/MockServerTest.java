@@ -15,9 +15,10 @@
  */
 package org.uniknow.agiledev.docMockRest.swagger;
 
-import com.github.tomakehurst.wiremock.client.MappingBuilder;
+import com.github.tomakehurst.wiremock.client.RemoteMappingBuilder;
 import com.github.tomakehurst.wiremock.http.RequestMethod;
-import com.github.tomakehurst.wiremock.matching.RequestPattern;
+import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
+import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import io.swagger.models.Operation;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -35,9 +36,11 @@ import java.io.IOException;
 import java.net.Socket;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Validates functionality of MockServer (swagger)
@@ -58,7 +61,7 @@ public class MockServerTest {
      */
     @Test
     public void testRetrievingStub() {
-        MappingBuilder stub = server.when("createUser");
+        RemoteMappingBuilder stub = server.when("createUser");
         assertNotNull(stub);
     }
 
@@ -120,8 +123,9 @@ public class MockServerTest {
      */
     @Test
     public void testGetOperationByStub() {
-        Operation operation = server.getOperation(new RequestPattern(
-            RequestMethod.GET, "/user/test"));
+        Operation operation = server.getOperation(new RequestPatternBuilder(
+            RequestMethod.GET, UrlPattern.fromOneOf("/user/test", null, null,
+                null)).build());
         assertNotNull(operation);
     }
 
@@ -138,8 +142,9 @@ public class MockServerTest {
      */
     @Test
     public void testGetNonExistingOperation() {
-        assertNull(server.getOperation(new RequestPattern(RequestMethod.GET,
-            "/nonexisting/operation")));
+        assertNull(server.getOperation(new RequestPatternBuilder(
+            RequestMethod.GET, UrlPattern.fromOneOf("/nonexisting/operation",
+                null, null, null)).build()));
     }
 
     /**

@@ -15,8 +15,8 @@
  */
 package org.uniknow.agiledev.docMockRest;
 
+import com.github.tomakehurst.wiremock.matching.MultiValuePattern;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
-import com.github.tomakehurst.wiremock.matching.ValuePattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
@@ -57,17 +57,19 @@ public class RequestPatternMatcher {
             // the first one.
             String secondRequestUrl = second.getUrl() == null ? second
                 .getUrlPattern() : second.getUrl();
-            if ((first.getUrlPattern() != null)
-                && Pattern.matches(first.getUrlPattern(), secondRequestUrl)) {
+            String urlPattern = first.getUrlPattern();
+            if ((urlPattern != null)
+                && (Pattern.matches(urlPattern, secondRequestUrl) || urlPattern
+                    .equals(secondRequestUrl))) {
 
                 // Check whether first request has mandatory query parameters
-                Map<String, ValuePattern> mandatoryQueryParameters = first
+                Map<String, MultiValuePattern> mandatoryQueryParameters = first
                     .getQueryParameters();
                 if (mandatoryQueryParameters != null
                     && !mandatoryQueryParameters.isEmpty()) {
                     // Check whether second request pattern contains all
                     // mandatory query parameters
-                    Map<String, ValuePattern> queryParameters = second
+                    Map<String, MultiValuePattern> queryParameters = second
                         .getQueryParameters();
                     if ((queryParameters != null) && !queryParameters.isEmpty()) {
                         if (!queryParameters.keySet().containsAll(
@@ -82,11 +84,13 @@ public class RequestPatternMatcher {
                 }
 
                 // Check whether first request has mandatory header parameters
-                Map<String, ValuePattern> mandatoryHeaders = first.getHeaders();
+                Map<String, MultiValuePattern> mandatoryHeaders = first
+                    .getHeaders();
                 if (mandatoryHeaders != null && !mandatoryHeaders.isEmpty()) {
                     // Check whether second request pattern contains all
                     // mandatory headers
-                    Map<String, ValuePattern> headers = second.getHeaders();
+                    Map<String, MultiValuePattern> headers = second
+                        .getHeaders();
                     if ((headers != null) && !headers.isEmpty()) {
                         if (!headers.keySet().containsAll(
                             mandatoryHeaders.keySet())) {

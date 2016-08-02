@@ -360,7 +360,7 @@ public class SwaggerMockServer {
      */
     private void createResponseBadRequest(HttpMethod method, String url,
         Operation operation) {
-        if ((operation != null) && hasMandatoryParameters(operation)) {
+        if ((operation != null) && hasMandatoryQueryParameters(operation)) {
 
             LOG.info("Creating default response for bad request [{}]:{}",
                 method, url);
@@ -383,9 +383,9 @@ public class SwaggerMockServer {
     /**
      * Returns whether the Operation has mandatory query parameters.
      */
-    private boolean hasMandatoryParameters(Operation operation) {
+    private boolean hasMandatoryQueryParameters(Operation operation) {
         for (Parameter parameter : operation.getParameters()) {
-            if (parameter.getRequired()) {
+            if (parameter.getRequired() && parameter.getIn().equalsIgnoreCase("query")) {
                 return true;
             }
         }

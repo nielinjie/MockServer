@@ -19,6 +19,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.LocalMappingBuilder;
 import com.github.tomakehurst.wiremock.client.RemoteMappingBuilder;
 import com.github.tomakehurst.wiremock.client.WireMockMappingBuilder;
+import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import com.github.tomakehurst.wiremock.core.ConfigurationException;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
 import io.swagger.jaxrs.Reader;
@@ -95,7 +96,8 @@ public class SwaggerMockServer {
      */
     public SwaggerMockServer(int port) {
         LOG.info("Starting MockServer listening on port {}", port);
-        wireMockServer = new WireMockServer(wireMockConfig().port(port));
+        wireMockServer = new WireMockServer(wireMockConfig().port(port)
+            .notifier(new Slf4jNotifier(true)));
         wireMockServer.start();
 
         // Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -356,7 +358,8 @@ public class SwaggerMockServer {
     }
 
     /**
-     * Creates default response for requests without mandatory parameters or missing headers.
+     * Creates default response for requests without mandatory parameters or
+     * missing headers.
      */
     private void createResponseBadRequest(HttpMethod method, String url,
         Operation operation) {
@@ -385,7 +388,8 @@ public class SwaggerMockServer {
      */
     private boolean hasMandatoryQueryParameters(Operation operation) {
         for (Parameter parameter : operation.getParameters()) {
-            if (parameter.getRequired() && parameter.getIn().equalsIgnoreCase("query")) {
+            if (parameter.getRequired()
+                && parameter.getIn().equalsIgnoreCase("query")) {
                 return true;
             }
         }

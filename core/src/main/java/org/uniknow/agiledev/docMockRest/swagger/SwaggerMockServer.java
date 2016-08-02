@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
 import org.uniknow.agiledev.docMockRest.JsonResponsesMappingsLoader;
 import org.uniknow.agiledev.docMockRest.RequestPatternMatcher;
+import org.uniknow.agiledev.docMockRest.SystemError;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
@@ -315,43 +316,87 @@ public class SwaggerMockServer {
         stubOperation(HttpMethod.DELETE, url, path.getDelete());
     }
 
+    /**
+     * Creates stub for specified URL
+     */
+    private RemoteMappingBuilder createStub(HttpMethod method, String url) {
+        // Replace path parameter place holders by regular expression.
+        // TODO: Replace . (match any character) by proper regular
+        // expression based on type parameter.
+        url = url.replaceAll("\\{.*\\}", ".*");
+
+        // Make sure that url also matches requests including query
+        // parameters
+        url = url + "(\\?.*)?";
+
+        RemoteMappingBuilder stub;
+        switch (method) {
+        case GET:
+            stub = get(urlMatching(url));
+            break;
+
+        case POST:
+            stub = post(urlMatching(url));
+            break;
+
+        case PUT:
+            stub = put(urlMatching(url));
+            break;
+
+        case DELETE:
+            stub = delete(urlMatching(url));
+            break;
+
+        default:
+            LOG.warn("[{}]:{} is not supported yet", method, url);
+            throw new SystemError("Unsupported HTTP Method");
+        }
+
+        return stub;
+    }
+
+    /**
+     * Creates default response for requests without mandatory parameters or missing headers.
+     */
+    private void createResponseBadRequest(HttpMethod method, String url,
+        Operation operation) {
+        if ((operation != null) && hasMandatoryParameters(operation)) {
+
+            LOG.info("Creating default response for bad request [{}]:{}",
+                method, url);
+            RemoteMappingBuilder stub = createStub(method, url);
+
+            // Create default response for stub
+            stub.willReturn(
+                aResponse()
+                    .withStatus(HttpStatus.SC_BAD_REQUEST)
+                    .withHeader("Content-Type", "text/plain")
+                    .withHeader("Cache-Control", "no-cache")
+                    .withBody(
+                        "Invalid Request, missing mandatory parameter or header"))
+                .atPriority(Integer.MAX_VALUE);
+
+            wireMockServer.stubFor(stub);
+        }
+    }
+
+    /**
+     * Returns whether the Operation has mandatory query parameters.
+     */
+    private boolean hasMandatoryParameters(Operation operation) {
+        for (Parameter parameter : operation.getParameters()) {
+            if (parameter.getRequired()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void stubOperation(HttpMethod method, String url,
         Operation operation) {
         if (operation != null) {
             LOG.info("Creating stub for [{}]:{}", method, url);
-            System.out.println("Creating stub for [" + method + "]:" + url);
-
-            // Replace path parameter place holders by regular expression.
-            // TODO: Replace . (match any character) by proper regular
-            // expression based on type parameter.
-            url = url.replaceAll("\\{.*\\}", ".*");
-
-            // Make sure that url also matches requests including query
-            // parameters
-            url = url + "(\\?.*)?";
-
-            RemoteMappingBuilder stub;
-            switch (method) {
-            case GET:
-                stub = get(urlMatching(url));
-                break;
-
-            case POST:
-                stub = post(urlMatching(url));
-                break;
-
-            case PUT:
-                stub = put(urlMatching(url));
-                break;
-
-            case DELETE:
-                stub = delete(urlMatching(url));
-                break;
-
-            default:
-                LOG.warn("[{}]:{} is not supported yet", method, url);
-                return;
-            }
+            RemoteMappingBuilder stub = createStub(method, url);
 
             // TODO: Add matching of query parameters and/or headers
             for (Parameter parameter : operation.getParameters()) {
@@ -372,6 +417,9 @@ public class SwaggerMockServer {
                     .withHeader("Cache-Control", "no-cache")
                     .withBody("No mocked response defined yet")).atPriority(
                 Integer.MAX_VALUE);
+
+            // Create response for bad request
+            createResponseBadRequest(method, url, operation);
 
             // Add stub to dictionary for later retrieval
             LOG.info("Adding stub for operation {}", operation.getOperationId());

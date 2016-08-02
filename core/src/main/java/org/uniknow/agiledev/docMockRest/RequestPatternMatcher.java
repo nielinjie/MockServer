@@ -17,6 +17,7 @@ package org.uniknow.agiledev.docMockRest;
 
 import com.github.tomakehurst.wiremock.matching.MultiValuePattern;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
+import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
@@ -55,12 +56,22 @@ public class RequestPatternMatcher {
         if (first.getMethod().equals(second.getMethod())) {
             // Check whether URL of second pattern matches the URL pattern of
             // the first one.
-            String secondRequestUrl = second.getUrl() == null ? second
-                .getUrlPattern() : second.getUrl();
-            String urlPattern = first.getUrlPattern();
-            if ((urlPattern != null)
-                && (Pattern.matches(urlPattern, secondRequestUrl) || urlPattern
-                    .equals(secondRequestUrl))) {
+
+            // UrlPattern pattern = UrlPattern.fromOneOf(first.getUrl(),
+            // first.getUrlPattern(), first.getUrlPath(),
+            // first.getUrlPathPattern());
+
+            // String secondRequestUrl = second.getUrl() == null ? second
+            // .getUrlPattern() : second.getUrl();
+            if (first.getUrlMatcher().match(getUrlToMatch(second))
+                .isExactMatch()) {
+
+                // .match(secondRequestUrl).isExactMatch()) {
+                // String urlPattern = first.getUrlPattern();
+                // if ((urlPattern != null)
+                // && (Pattern.matches(urlPattern, secondRequestUrl) ||
+                // urlPattern
+                // .equals(secondRequestUrl))) {
 
                 // Check whether first request has mandatory query parameters
                 Map<String, MultiValuePattern> mandatoryQueryParameters = first
@@ -74,11 +85,15 @@ public class RequestPatternMatcher {
                     if ((queryParameters != null) && !queryParameters.isEmpty()) {
                         if (!queryParameters.keySet().containsAll(
                             mandatoryQueryParameters.keySet())) {
-                            LOG.debug("Missing mandatory query parameter");
+                            LOG.info(
+                                "Missing mandatory query parameter, (required:{}, provided:{})",
+                                mandatoryQueryParameters, queryParameters);
                             return false;
                         }
                     } else {
-                        LOG.debug("Missing mandatory query parameter");
+                        LOG.info(
+                            "Missing mandatory query parameter, (required:{}, provided:{})",
+                            mandatoryQueryParameters, queryParameters);
                         return false;
                     }
                 }
@@ -94,11 +109,15 @@ public class RequestPatternMatcher {
                     if ((headers != null) && !headers.isEmpty()) {
                         if (!headers.keySet().containsAll(
                             mandatoryHeaders.keySet())) {
-                            LOG.debug("Missing mandatory header parameters");
+                            LOG.info(
+                                "Missing mandatory header parameters, (required:{}, provided:{})",
+                                mandatoryHeaders, headers);
                             return false;
                         }
                     } else {
-                        LOG.debug("Missing mandatory headers");
+                        LOG.info(
+                            "Missing mandatory header parameters, (required:{}, provided:{})",
+                            mandatoryHeaders, headers);
                         return false;
                     }
                 }
@@ -106,11 +125,33 @@ public class RequestPatternMatcher {
                 LOG.debug("Request patterns match.");
                 return true;
             } else {
-                LOG.debug("Mismatch URLs");
+                LOG.info("Mismatch URLs (spec:{},received:{})",
+                    first.getUrlMatcher(), second.getUrlMatcher());
             }
         } else {
             LOG.debug("Mismatch methods");
         }
         return false;
+    }
+
+    /**
+     * Returns URL string that will be compared
+     */
+    private String getUrlToMatch(RequestPattern pattern) {
+        String response = pattern.getUrl();
+        if (response == null) {
+            response = pattern.getUrlPath();
+            if (response == null) {
+                response = pattern.getUrlPattern();
+                if (response == null) {
+                    response = pattern.getUrlPathPattern();
+                    if (response == null) {
+                        throw new SystemError(
+                            "Received Request pattern without proper URL to match");
+                    }
+                }
+            }
+        }
+        return response;
     }
 }

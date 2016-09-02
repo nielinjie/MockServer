@@ -75,6 +75,8 @@ public class SwaggerConfig {
     private URL responseFileUrl;
 
     void precessServer(SwaggerMockServer server) throws IOException {
+        System.setProperty("debugParser","true");
+
         if (null != swaggerFileLocation && null != swaggerPrefix)
             throw new IllegalArgumentException("both file location and prefix");
         if (null != responseFileLocation && null != responseFileUrl)

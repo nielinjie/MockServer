@@ -142,6 +142,10 @@ public class SwaggerMockServer {
      * @return matching operation or null.
      */
     // TODO 疑似bug，两个pattern，如何相互match？
+    // 能否采用operationId 获取？-
+    // 需要用于json格式的response文件来配对。
+    // 但json格式的response文件是谁定义的？wiremock定义的？
+    // 可以重新定义？可以不管，抛弃response文件？
     public Operation getOperation(@NotNull RequestPattern request) {
 
         String requestUrl = request.getUrl() == null ? request.getUrlPattern()

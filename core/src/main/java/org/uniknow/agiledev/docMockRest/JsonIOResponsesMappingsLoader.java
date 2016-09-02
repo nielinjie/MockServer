@@ -86,12 +86,17 @@ public class JsonIOResponsesMappingsLoader implements MappingsLoader {
 
             for (StubMapping mapping : mappings) {
                 // Check whether operation exist for specified stub response
+                // NOTE 由于stubmapping（wiremock定义）里面没有operationid，只能用request pattern获取。
+                // 考虑分别处理，在不需要response文件的时候使用operationid，
+                // 是不是不要response文件的时候根本就不需要getOperation？ - 貌似是的。
                 if (mockServer.getOperation(mapping.getRequest()) != null) {
+
+
+                    ResponseDefinition response = mapping.getResponse();
 
                     // When body file specified load response and put in body.
                     // Reason for this is that responses are within jar and
                     // wiremock is not able to handle those correctly
-                    ResponseDefinition response = mapping.getResponse();
                     if (response != null && response.getBodyFileName() != null) {
                         URL locationResponseBodyFile = getClass()
                             .getClassLoader().getResource(

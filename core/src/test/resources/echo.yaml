@@ -33,6 +33,25 @@ paths:
           description: "Error"
           schema:
             $ref: Error
+  /echo/{message}:
+    get:
+      description: "Returns the 'message' to the caller"
+      operationId: "echoMessage"
+      parameters:
+        - name: message
+          in: path
+          type: string
+          required: true
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: EchoResponse
+        default:
+          description: "Error"
+          schema:
+            $ref: Error
+
 definitions:
   EchoResponse:
     required:

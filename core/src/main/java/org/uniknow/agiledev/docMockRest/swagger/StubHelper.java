@@ -40,7 +40,7 @@ class StubHelper {
         swaggerMockServer.setSpecification(specification);
 
         // Create stubs for resources within specification
-        stubResources(specification);
+        stubPaths(specification);
     }
 
     /**
@@ -49,21 +49,25 @@ class StubHelper {
      * @param specification
      *            Swagger specification
      */
-    private void stubResources(Swagger specification) {
+    private void stubPaths(Swagger specification) {
 
         if (specification.getPaths() != null
             && !specification.getPaths().isEmpty()) {
             for (Map.Entry<String, Path> paths : specification.getPaths()
                 .entrySet()) {
                 LOG.debug("Processing operation(s) at path {}", paths.getKey());
-                stubResource(paths.getKey(), paths.getValue());
+                //path里面有参数作为不同的path ->
+                //form http://swagger.io/specification/#pathTemplating -
+                //Path templating refers to the usage of curly braces ({}) to mark a section of a URL path as replaceable using path parameters.
+
+                stubPath(paths.getKey(), paths.getValue());
             }
         } else {
             LOG.warn("No operations found. Make sure that the annotated classes are on the classpath of the server.");
         }
     }
 
-    private void stubResource(String url, Path path) {
+    private void stubPath(String url, Path path) {
         stubOperation(HttpMethod.GET, url, path.getGet());
         stubOperation(HttpMethod.PUT, url, path.getPut());
         stubOperation(HttpMethod.POST, url, path.getPost());
@@ -77,6 +81,7 @@ class StubHelper {
             RemoteMappingBuilder stub = createStub(method, url);
 
             // TODO: Add matching of query parameters and/or headers
+            // TODO: path 里的参数如何？
             for (Parameter parameter : operation.getParameters()) {
                 LOG.debug("Processing parameter {}", parameter.getIn());
                 if (parameter.getRequired()) {
@@ -87,7 +92,9 @@ class StubHelper {
                     }
                 }
             }
-
+            //TODO 在这里添加MockResponse -
+            // 制造com.github.tomakehurst.wiremock.http.ResponseDefinition
+            // 装进去 -
             // Create default response for stub
             stub.willReturn(
                 WireMock.aResponse().withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
@@ -105,6 +112,7 @@ class StubHelper {
 
             // Add operation to dictionary for later retrieval
             // TODO: Instead of creating own key, use request pattern
+            // TODO 有问题，operation 是有id的，为何不用？
             // String urlExpression = method + ":" + url;
             RequestPattern request = stub.build().getRequest();
             LOG.info("Adding operation {} for request {}",
@@ -124,10 +132,12 @@ class StubHelper {
         // Replace path parameter place holders by regular expression.
         // TODO: Replace . (match any character) by proper regular
         // expression based on type parameter.
+        // 这里处理掉了path template 参数
         url = url.replaceAll("\\{.*\\}", ".*");
 
         // Make sure that url also matches requests including query
         // parameters
+        // 替换可能跟wiremock语法有关。
         url = url + "(\\?.*)?";
 
         RemoteMappingBuilder stub;

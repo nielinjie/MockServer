@@ -51,7 +51,7 @@ public class MockServerTest {
 
     @BeforeClass
     public static void init() {
-        server = new SwaggerMockServer(
+        server = SwaggerMockServer.createSwaggerMockServerByPrefix(
             "org.uniknow.agiledev.docMockRest.examples.swagger.annotated", 8080);
 
     }

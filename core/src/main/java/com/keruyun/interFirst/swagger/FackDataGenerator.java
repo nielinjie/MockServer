@@ -13,17 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.uniknow.agiledev.docMockRest.swagger;
+package com.keruyun.interFirst.swagger;
 
-import java.io.FileNotFoundException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.tomakehurst.wiremock.standalone.MappingsLoader;
+import com.github.tomakehurst.wiremock.stubbing.StubMapping;
+import com.github.tomakehurst.wiremock.stubbing.StubMappings;
+import org.everit.json.schema.Schema;
+
+import java.io.InputStream;
 
 /**
- * Created by mase on 6/29/2016.
+ * Created by nielinjie on 8/29/16.
  */
-public class RunMockServer {
-
-    public static void main(String[] args) throws FileNotFoundException {
-        SwaggerMockServer.createSwaggerMockServerByPrefix(
-            "org.uniknow.agiledev.docMockRest.examples.swagger.annotated", 8080);
-    }
+public class FackDataGenerator {
+    // public JsonNode generate(Schema schema) {
+    //
+    // }
 }

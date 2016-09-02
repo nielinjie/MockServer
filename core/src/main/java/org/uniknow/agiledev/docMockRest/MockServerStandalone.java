@@ -24,8 +24,6 @@ import org.uniknow.agiledev.docMockRest.swagger.SwaggerMockServer;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import static java.util.Arrays.asList;
-
 /**
  * Created by mase on 6/29/2016.
  */
@@ -67,7 +65,8 @@ public class MockServerStandalone {
 
         } else if (options.has(swagger)) {
             // Create MockServer supporting Swagger
-            new SwaggerMockServer(swagger.value(options), port.value(options));
+            // NOTE no repsonses file?
+            SwaggerMockServer.createSwaggerMockServerByPrefix(swagger.value(options), port.value(options));
         } else {
             parser.printHelpOn(System.out);
             throw new SystemError(

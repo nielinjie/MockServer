@@ -16,9 +16,7 @@
 package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.LocalMappingBuilder;
 import com.github.tomakehurst.wiremock.client.RemoteMappingBuilder;
-import com.github.tomakehurst.wiremock.client.WireMockMappingBuilder;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import com.github.tomakehurst.wiremock.core.ConfigurationException;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
@@ -28,13 +26,14 @@ import io.swagger.models.Operation;
 import io.swagger.models.Path;
 import io.swagger.models.Swagger;
 import io.swagger.models.parameters.Parameter;
+import io.swagger.parser.SwaggerParser;
 import org.apache.http.HttpStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
-import org.uniknow.agiledev.docMockRest.JsonResponsesMappingsLoader;
+import org.uniknow.agiledev.docMockRest.JsonIOResponsesMappingsLoader;
 import org.uniknow.agiledev.docMockRest.RequestPatternMatcher;
 import org.uniknow.agiledev.docMockRest.SystemError;
 
@@ -109,60 +108,76 @@ public class SwaggerMockServer {
         // });
     }
 
-    /**
-     * Constructor Mock Server
-     * 
-     * @param prefix
-     *            Package that need to be scanned for annotated classes
-     * @param port
-     *            Port on which mock server will be reachable.
-     */
-    public SwaggerMockServer(String prefix, int port) {
+
+
+
+    public SwaggerMockServer(Swagger swagger,int port){
         this(port);
-
-        // Create Swagger specification based on annotated classes
-        Swagger specification = getSpecification(prefix);
-
-        // Create default stubs for operations within specification
-        createStubs(specification);
+        createStubs(swagger);
     }
+
+    public SwaggerMockServer(String location,int port){
+        Swagger swagger = new SwaggerParser().read(location);
+        new SwaggerMockServer(swagger,port);
+    }
+
+//    /**
+//     * Constructor Mock Server
+//     *
+//     * @param prefix
+//     *            Package that need to be scanned for annotated classes
+//     * @param port
+//     *            Port on which mock server will be reachable.
+//     * @param responseFile
+//     *            File containing responses for stubs
+//     */
+//    public SwaggerMockServer(String prefix, int port, String responseFile)
+//        throws IOException {
+//        this(prefix, port);
+//
+//        LOG.info("Loading responses of {}", responseFile);
+//        wireMockServer.loadMappingsUsing(new JsonIOResponsesMappingsLoader(
+//            this, responseFile));
+//    }
 
     /**
      * Constructor Mock Server
      * 
-     * @param prefix
-     *            Package that need to be scanned for annotated classes
+     * @param swagger
+     *            swagger
      * @param port
      *            Port on which mock server will be reachable.
      * @param responseFile
      *            File containing responses for stubs
      */
-    public SwaggerMockServer(String prefix, int port, String responseFile)
+    public SwaggerMockServer(Swagger swagger, int port, URL responseFile)
         throws IOException {
-        this(prefix, port);
+        this(swagger, port);
 
         LOG.info("Loading responses of {}", responseFile);
-        wireMockServer.loadMappingsUsing(new JsonResponsesMappingsLoader(this,
-            responseFile));
+        wireMockServer.loadMappingsUsing(new JsonIOResponsesMappingsLoader(
+            this, responseFile));
     }
-
-    /**
-     * Constructor Mock Server
-     * 
-     * @param prefix
-     *            Package that need to be scanned for annotated classes
-     * @param port
-     *            Port on which mock server will be reachable.
-     * @param responseFile
-     *            File containing responses for stubs
-     */
     public SwaggerMockServer(String prefix, int port, URL responseFile)
-        throws IOException {
+            throws IOException {
         this(prefix, port);
 
         LOG.info("Loading responses of {}", responseFile);
-        wireMockServer.loadMappingsUsing(new JsonResponsesMappingsLoader(this,
-            responseFile));
+        wireMockServer.loadMappingsUsing(new JsonIOResponsesMappingsLoader(
+                this, responseFile));
+    }
+    public SwaggerMockServer(String prefix, int port, String responseFile)
+            throws IOException {
+        this(prefix, port);
+
+        LOG.info("Loading responses of {}", responseFile);
+        wireMockServer.loadMappingsUsing(new JsonIOResponsesMappingsLoader(
+                this, responseFile));
+    }
+
+    public static SwaggerMockServer createSwaggerMockServerByPrefix(String prefix, int port) {
+        Swagger specification = getSpecification(prefix);
+        return new SwaggerMockServer(specification, port);
     }
 
     /**
@@ -183,7 +198,7 @@ public class SwaggerMockServer {
      *            Package that need to be scanned for annotated classes
      * @return Swagger specification
      */
-    private Swagger getSpecification(String prefix) {
+    private static Swagger getSpecification(String prefix) {
         LOG.info("Create swagger model based on annotated classes within {}",
             prefix);
 

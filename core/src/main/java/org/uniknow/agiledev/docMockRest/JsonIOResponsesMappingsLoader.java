@@ -35,7 +35,7 @@ import java.net.URL;
 /**
  * Class responsible for loading responses in json file
  */
-public class JsonResponsesMappingsLoader implements MappingsLoader {
+public class JsonIOResponsesMappingsLoader implements MappingsLoader {
 
     private final static Logger LOG = LoggerFactory
         .getLogger(SwaggerMockServer.class);
@@ -56,17 +56,17 @@ public class JsonResponsesMappingsLoader implements MappingsLoader {
      * @param locationResponsesFile
      *            Location of file containing stub responses.
      */
-    public JsonResponsesMappingsLoader(SwaggerMockServer mockServer,
+    public JsonIOResponsesMappingsLoader(SwaggerMockServer mockServer,
         String locationResponsesFile) throws FileNotFoundException {
         this(mockServer, new FileInputStream(locationResponsesFile));
     }
 
-    public JsonResponsesMappingsLoader(SwaggerMockServer mockServer,
+    public JsonIOResponsesMappingsLoader(SwaggerMockServer mockServer,
         URL locationResponsesFile) throws IOException {
         this(mockServer, locationResponsesFile.openStream());
     }
 
-    public JsonResponsesMappingsLoader(SwaggerMockServer mockServer,
+    public JsonIOResponsesMappingsLoader(SwaggerMockServer mockServer,
         InputStream responsesFile) {
         this.locationResponsesFile = responsesFile;
         this.mockServer = mockServer;

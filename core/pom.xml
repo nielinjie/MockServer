@@ -260,23 +260,23 @@
                 code conventions. The formatter is based on the eclipse
                 formatted and can use the exported xml formatting definitions
             -->
-            <plugin>
-                <groupId>com.googlecode.maven-java-formatter-plugin
-                </groupId>
-                <artifactId>maven-java-formatter-plugin</artifactId>
-                <version>0.4</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <lineEnding>LF</lineEnding>
-                    <configFile>${project.basedir}/src/build-configuration/formatter/uniknow.xml</configFile>
-                </configuration>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>com.googlecode.maven-java-formatter-plugin-->
+                <!--</groupId>-->
+                <!--<artifactId>maven-java-formatter-plugin</artifactId>-->
+                <!--<version>0.4</version>-->
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>format</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+                <!--<configuration>-->
+                    <!--<lineEnding>LF</lineEnding>-->
+                    <!--<configFile>${project.basedir}/src/build-configuration/formatter/uniknow.xml</configFile>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
 
             <!--
             AspectJ compile time weaving. Required for Design by Contract

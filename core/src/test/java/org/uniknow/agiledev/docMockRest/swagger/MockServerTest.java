@@ -1,17 +1,17 @@
 /**
  * Copyright (C) 2016 UniKnow (info.uniknow@gmail.com)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * 
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.uniknow.agiledev.docMockRest.swagger;
 
@@ -51,8 +51,17 @@ public class MockServerTest {
 
     @BeforeClass
     public static void init() {
-        server = SwaggerMockServer.createSwaggerMockServerByPrefix(
-            "org.uniknow.agiledev.docMockRest.examples.swagger.annotated", 8080);
+
+        try {
+            server = new SwaggerMockServer(
+                    SwaggerConfig
+                            .create()
+                            .setSwaggerPrefix(
+                                    "org.uniknow.agiledev.docMockRest.examples.swagger.annotated"),
+                    8080);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -70,7 +79,7 @@ public class MockServerTest {
      */
     @Test
     public void testInvokeStubbedOperationWithNoResponseDefined()
-        throws IOException {
+            throws IOException {
         HttpClient client = new DefaultHttpClient();
         HttpGet request;
         HttpResponse response;
@@ -79,15 +88,15 @@ public class MockServerTest {
         request = new HttpGet("http://localhost:8080/user/x");
         response = client.execute(request);
         assertEquals(HttpStatus.SC_NOT_IMPLEMENTED, response.getStatusLine()
-            .getStatusCode());
+                .getStatusCode());
         EntityUtils.consumeQuietly(response.getEntity());
 
         // Check proper response is returned for operation with query parameters
         request = new HttpGet(
-            "http://localhost:8080/user/login?username=test&password=test");
+                "http://localhost:8080/user/login?username=test&password=test");
         response = client.execute(request);
         assertEquals(HttpStatus.SC_NOT_IMPLEMENTED, response.getStatusLine()
-            .getStatusCode());
+                .getStatusCode());
         EntityUtils.consumeQuietly(response.getEntity());
     }
 
@@ -102,19 +111,19 @@ public class MockServerTest {
         HttpGet request = new HttpGet("http://localhost:8080/user/logout");
         HttpResponse response = client.execute(request);
         assertEquals(HttpStatus.SC_NOT_IMPLEMENTED, response.getStatusLine()
-            .getStatusCode());
+                .getStatusCode());
         EntityUtils.consumeQuietly(response.getEntity());
 
         // Change response into 403
         server.stubFor(server.when("logoutUser").willReturn(
-            aResponse().withBody("Unauthorized access").withStatus(
-                HttpStatus.SC_FORBIDDEN)));
+                aResponse().withBody("Unauthorized access").withStatus(
+                        HttpStatus.SC_FORBIDDEN)));
 
         // Verify response is now 403
         request = new HttpGet("http://localhost:8080/user/logout");
         response = client.execute(request);
         assertEquals(HttpStatus.SC_FORBIDDEN, response.getStatusLine()
-            .getStatusCode());
+                .getStatusCode());
         EntityUtils.consumeQuietly(response.getEntity());
     }
 
@@ -124,7 +133,7 @@ public class MockServerTest {
     @Test
     public void testGetOperationByStub() {
         Operation operation = server.getOperation(new RequestPatternBuilder(
-            RequestMethod.GET, UrlPattern.fromOneOf("/user/test", null, null,
+                RequestMethod.GET, UrlPattern.fromOneOf("/user/test", null, null,
                 null)).build());
         assertNotNull(operation);
     }
@@ -143,7 +152,7 @@ public class MockServerTest {
     @Test
     public void testGetNonExistingOperation() {
         assertNull(server.getOperation(new RequestPatternBuilder(
-            RequestMethod.GET, UrlPattern.fromOneOf("/nonexisting/operation",
+                RequestMethod.GET, UrlPattern.fromOneOf("/nonexisting/operation",
                 null, null, null)).build()));
     }
 
@@ -156,22 +165,25 @@ public class MockServerTest {
         try {
             // Find responses file on classpath
             String responseFileLocation = this.getClass()
-                .getResource("responses.json").getFile();
+                    .getResource("responses.json").getFile();
 
             // Initiate mock server
-            serverWithResponse = new SwaggerMockServer(
-                "org.uniknow.agiledev.docMockRest.swagger", 9090,
-                responseFileLocation);
+            // serverWithResponse = new SwaggerMockServer(
+            // "org.uniknow.agiledev.docMockRest.swagger", 9090,
+            // responseFileLocation);
+            serverWithResponse = new SwaggerMockServer(SwaggerConfig.create()
+                    .setSwaggerPrefix("org.uniknow.agiledev.docMockRest.swagger")
+                    .setResponseFileLocation(responseFileLocation), 9090);
 
             // Verify correct result is returned
             HttpClient client = new DefaultHttpClient();
             HttpGet request = new HttpGet(
-                "http://localhost:9090/HelloWorld/TEST");
+                    "http://localhost:9090/HelloWorld/TEST");
             HttpResponse response = client.execute(request);
             assertEquals(HttpStatus.SC_OK, response.getStatusLine()
-                .getStatusCode());
+                    .getStatusCode());
             assertEquals("Hello TEST",
-                new BasicResponseHandler().handleResponse(response));
+                    new BasicResponseHandler().handleResponse(response));
         } finally {
             if (serverWithResponse != null) {
                 serverWithResponse.shutdown();
@@ -185,18 +197,21 @@ public class MockServerTest {
      */
     @Test(expected = SystemError.class)
     public void initiateServerWithResponseFileContainingNonExistingOperations()
-        throws IOException {
+            throws IOException {
         SwaggerMockServer serverWithResponse = null;
 
         try {
             // Find responses file on classpath
             String responseFileLocation = this.getClass()
-                .getResource("responses-non-existing-operation.json").getFile();
+                    .getResource("responses-non-existing-operation.json").getFile();
 
             // Initiate mock server
-            serverWithResponse = new SwaggerMockServer(
-                "org.uniknow.agiledev.docMockRest.swagger", 7070,
-                responseFileLocation);
+            // serverWithResponse = new SwaggerMockServer(
+            // "org.uniknow.agiledev.docMockRest.swagger", 7070,
+            // responseFileLocation);
+            serverWithResponse = new SwaggerMockServer(SwaggerConfig.create()
+                    .setSwaggerPrefix("org.uniknow.agiledev.docMockRest.swagger")
+                    .setResponseFileLocation(responseFileLocation), 7070);
         } finally {
             if (serverWithResponse != null) {
                 serverWithResponse.shutdown();

@@ -1,18 +1,19 @@
 /**
  * Copyright (C) 2016 UniKnow (info.uniknow@gmail.com)
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- * 
- * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package org.uniknow.agiledev.docMockRest.swagger;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
@@ -20,38 +21,21 @@ import com.github.tomakehurst.wiremock.client.RemoteMappingBuilder;
 import com.github.tomakehurst.wiremock.common.Slf4jNotifier;
 import com.github.tomakehurst.wiremock.core.ConfigurationException;
 import com.github.tomakehurst.wiremock.matching.RequestPattern;
-import io.swagger.jaxrs.Reader;
-import io.swagger.models.HttpMethod;
 import io.swagger.models.Operation;
-import io.swagger.models.Path;
 import io.swagger.models.Swagger;
-import io.swagger.models.parameters.Parameter;
-import io.swagger.parser.SwaggerParser;
-import org.apache.http.HttpStatus;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uniknow.agiledev.dbc4java.Validated;
-import org.uniknow.agiledev.docMockRest.JsonIOResponsesMappingsLoader;
 import org.uniknow.agiledev.docMockRest.RequestPatternMatcher;
-import org.uniknow.agiledev.docMockRest.SystemError;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.NotFoundException;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.delete;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.matching;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 
 /**
@@ -60,13 +44,13 @@ import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMoc
 @Validated
 public class SwaggerMockServer {
 
-    private final static Logger LOG = LoggerFactory
-        .getLogger(SwaggerMockServer.class);
+    final static Logger LOG = LoggerFactory.getLogger(SwaggerMockServer.class);
+    final StubHelper stubHelper = new StubHelper(this);
 
     /*
      * Contains instance of created wire mock server
      */
-    private WireMockServer wireMockServer;
+    WireMockServer wireMockServer;
 
     /**
      * Maps operation ID to matching stub
@@ -108,76 +92,9 @@ public class SwaggerMockServer {
         // });
     }
 
-
-
-
-    public SwaggerMockServer(Swagger swagger,int port){
+    public SwaggerMockServer(SwaggerConfig config, int port) throws IOException {
         this(port);
-        createStubs(swagger);
-    }
-
-    public SwaggerMockServer(String location,int port){
-        Swagger swagger = new SwaggerParser().read(location);
-        new SwaggerMockServer(swagger,port);
-    }
-
-//    /**
-//     * Constructor Mock Server
-//     *
-//     * @param prefix
-//     *            Package that need to be scanned for annotated classes
-//     * @param port
-//     *            Port on which mock server will be reachable.
-//     * @param responseFile
-//     *            File containing responses for stubs
-//     */
-//    public SwaggerMockServer(String prefix, int port, String responseFile)
-//        throws IOException {
-//        this(prefix, port);
-//
-//        LOG.info("Loading responses of {}", responseFile);
-//        wireMockServer.loadMappingsUsing(new JsonIOResponsesMappingsLoader(
-//            this, responseFile));
-//    }
-
-    /**
-     * Constructor Mock Server
-     * 
-     * @param swagger
-     *            swagger
-     * @param port
-     *            Port on which mock server will be reachable.
-     * @param responseFile
-     *            File containing responses for stubs
-     */
-    public SwaggerMockServer(Swagger swagger, int port, URL responseFile)
-        throws IOException {
-        this(swagger, port);
-
-        LOG.info("Loading responses of {}", responseFile);
-        wireMockServer.loadMappingsUsing(new JsonIOResponsesMappingsLoader(
-            this, responseFile));
-    }
-    public SwaggerMockServer(String prefix, int port, URL responseFile)
-            throws IOException {
-        this(prefix, port);
-
-        LOG.info("Loading responses of {}", responseFile);
-        wireMockServer.loadMappingsUsing(new JsonIOResponsesMappingsLoader(
-                this, responseFile));
-    }
-    public SwaggerMockServer(String prefix, int port, String responseFile)
-            throws IOException {
-        this(prefix, port);
-
-        LOG.info("Loading responses of {}", responseFile);
-        wireMockServer.loadMappingsUsing(new JsonIOResponsesMappingsLoader(
-                this, responseFile));
-    }
-
-    public static SwaggerMockServer createSwaggerMockServerByPrefix(String prefix, int port) {
-        Swagger specification = getSpecification(prefix);
-        return new SwaggerMockServer(specification, port);
+        config.precessServer(this);
     }
 
     /**
@@ -192,30 +109,6 @@ public class SwaggerMockServer {
     }
 
     /**
-     * Returns specification based on annotated classes.
-     * 
-     * @param prefix
-     *            Package that need to be scanned for annotated classes
-     * @return Swagger specification
-     */
-    private static Swagger getSpecification(String prefix) {
-        LOG.info("Create swagger model based on annotated classes within {}",
-            prefix);
-
-        // Get all swagger annotated classes within specified package
-        SwaggerAnnotationScanner scanner = new SwaggerAnnotationScanner();
-        Set<Class<?>> resources = scanner.getResources(prefix);
-        LOG.debug("Found annotated classes are {}", resources);
-
-        // Read all annotated classes and create rest specifications
-        Swagger swagger = null;
-        Reader reader = new Reader(swagger);
-        swagger = reader.read(resources);
-
-        return swagger;
-    }
-
-    /**
      * Reset mock server removing all previously defined stubs
      */
     public void reset() {
@@ -224,22 +117,6 @@ public class SwaggerMockServer {
         wireMockServer.resetMappings();
         wireMockServer.resetRequests();
         wireMockServer.resetScenarios();
-    }
-
-    /**
-     * Creates server mocking REST APIs which are specified within swagger model
-     * 
-     * @param specification
-     *            Swagger specification
-     */
-    void createStubs(@NotNull Swagger specification) {
-        // Remove any previously defined stubs
-        reset();
-
-        this.specification = specification;
-
-        // Create stubs for resources within specification
-        stubResources(specification);
     }
 
     /**
@@ -279,6 +156,7 @@ public class SwaggerMockServer {
      * 
      * @return matching operation or null.
      */
+    //TODO 疑似bug，两个pattern，如何相互match？
     public Operation getOperation(@NotNull RequestPattern request) {
 
         String requestUrl = request.getUrl() == null ? request.getUrlPattern()
@@ -306,164 +184,24 @@ public class SwaggerMockServer {
         return getOperation(stub.build().getRequest()) != null;
     }
 
-    /**
-     * Stub the operations as specified within specification.
-     * 
-     * @param specification
-     *            Swagger specification
-     */
-    private void stubResources(Swagger specification) {
-
-        if (specification.getPaths() != null
-            && !specification.getPaths().isEmpty()) {
-            for (Map.Entry<String, Path> paths : specification.getPaths()
-                .entrySet()) {
-                LOG.debug("Processing operation(s) at path {}", paths.getKey());
-                stubResource(paths.getKey(), paths.getValue());
-            }
-        } else {
-            LOG.warn("No operations found. Make sure that the annotated classes are on the classpath of the server.");
-        }
+    public Map<String, RemoteMappingBuilder> getStubs() {
+        return stubs;
     }
 
-    private void stubResource(String url, Path path) {
-        stubOperation(HttpMethod.GET, url, path.getGet());
-        stubOperation(HttpMethod.PUT, url, path.getPut());
-        stubOperation(HttpMethod.POST, url, path.getPost());
-        stubOperation(HttpMethod.DELETE, url, path.getDelete());
+    public Map<RequestPattern, Operation> getOperations() {
+        return operations;
     }
 
-    /**
-     * Creates stub for specified URL
-     */
-    private RemoteMappingBuilder createStub(HttpMethod method, String url) {
-        // Replace path parameter place holders by regular expression.
-        // TODO: Replace . (match any character) by proper regular
-        // expression based on type parameter.
-        url = url.replaceAll("\\{.*\\}", ".*");
-
-        // Make sure that url also matches requests including query
-        // parameters
-        url = url + "(\\?.*)?";
-
-        RemoteMappingBuilder stub;
-        switch (method) {
-        case GET:
-            stub = get(urlMatching(url));
-            break;
-
-        case POST:
-            stub = post(urlMatching(url));
-            break;
-
-        case PUT:
-            stub = put(urlMatching(url));
-            break;
-
-        case DELETE:
-            stub = delete(urlMatching(url));
-            break;
-
-        default:
-            LOG.warn("[{}]:{} is not supported yet", method, url);
-            throw new SystemError("Unsupported HTTP Method");
-        }
-
-        return stub;
+    public Swagger getSpecification() {
+        return specification;
     }
 
-    /**
-     * Creates default response for requests without mandatory parameters or
-     * missing headers.
-     */
-    private void createResponseBadRequest(HttpMethod method, String url,
-        Operation operation) {
-        if ((operation != null) && hasMandatoryQueryParameters(operation)) {
-
-            LOG.info("Creating default response for bad request [{}]:{}",
-                method, url);
-            RemoteMappingBuilder stub = createStub(method, url);
-
-            // Create default response for stub
-            stub.willReturn(
-                aResponse()
-                    .withStatus(HttpStatus.SC_BAD_REQUEST)
-                    .withHeader("Content-Type", "text/plain")
-                    .withHeader("Cache-Control", "no-cache")
-                    .withBody(
-                        "Invalid Request, missing mandatory parameter or header"))
-                .atPriority(Integer.MAX_VALUE);
-
-            wireMockServer.stubFor(stub);
-        }
+    public WireMockServer getWireMockServer() {
+        return wireMockServer;
     }
 
-    /**
-     * Returns whether the Operation has mandatory query parameters.
-     */
-    private boolean hasMandatoryQueryParameters(Operation operation) {
-        for (Parameter parameter : operation.getParameters()) {
-            if (parameter.getRequired()
-                && parameter.getIn().equalsIgnoreCase("query")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void stubOperation(HttpMethod method, String url,
-        Operation operation) {
-        if (operation != null) {
-            LOG.info("Creating stub for [{}]:{}", method, url);
-            RemoteMappingBuilder stub = createStub(method, url);
-
-            // TODO: Add matching of query parameters and/or headers
-            for (Parameter parameter : operation.getParameters()) {
-                LOG.debug("Processing parameter {}", parameter.getIn());
-                if (parameter.getRequired()) {
-                    if (parameter.getIn().equalsIgnoreCase("query")) {
-                        stub.withQueryParam(parameter.getName(),
-                            matching(createRegularExpression(parameter
-                                .getPattern())));
-                    }
-                }
-            }
-
-            // Create default response for stub
-            stub.willReturn(
-                aResponse().withStatus(HttpStatus.SC_NOT_IMPLEMENTED)
-                    .withHeader("Content-Type", "text/plain")
-                    .withHeader("Cache-Control", "no-cache")
-                    .withBody("No mocked response defined yet")).atPriority(
-                Integer.MAX_VALUE);
-
-            // Create response for bad request
-            createResponseBadRequest(method, url, operation);
-
-            // Add stub to dictionary for later retrieval
-            LOG.info("Adding stub for operation {}", operation.getOperationId());
-            stubs.put(operation.getOperationId(), stub);
-
-            // Add operation to dictionary for later retrieval
-            // TODO: Instead of creating own key, use request pattern
-            // String urlExpression = method + ":" + url;
-            RequestPattern request = stub.build().getRequest();
-            LOG.info("Adding operation {} for request {}",
-                operation.getOperationId(), request);
-            operations.put(request, operation);
-
-            // Create default stub for operation
-            wireMockServer.stubFor(stub);
-
-        }
-    }
-
-    /**
-     * Create regular expression for matching any value of specific instance
-     * type
-     */
-    private String createRegularExpression(String type) {
-        return ".*";
+    public void setSpecification(Swagger specification) {
+        this.specification = specification;
     }
 
     // /**

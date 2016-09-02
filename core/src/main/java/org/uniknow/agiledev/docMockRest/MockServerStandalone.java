@@ -30,16 +30,16 @@ import java.io.IOException;
  */
 public class MockServerStandalone {
 
-    /**
-     * Method to start standalone Mock Server
-     * 
-     * @param args
-     *            arguments containing the location of the specification file
-     *            and port number on which mock server need to be accessible.
-     * @throws FileNotFoundException
-     *             if specification file could not be found.
-     */
-    public static void main(String[] args) throws IOException {
+	/**
+	 * Method to start standalone Mock Server
+	 * 
+	 * @param args
+	 *            arguments containing the location of the specification file
+	 *            and port number on which mock server need to be accessible.
+	 * @throws FileNotFoundException
+	 *             if specification file could not be found.
+	 */
+	public static void main(String[] args) throws IOException {
 
         OptionParser parser = new OptionParser("r::");
         OptionSpec<String> raml = parser

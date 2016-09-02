@@ -23,11 +23,12 @@ import java.io.IOException;
  */
 public class RunMockServer {
 
-    public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 
-        // new SwaggerMockServer(
-        // RunMockServer.class.getResource("/echo.yaml").getFile(), 8080);
+		// new SwaggerMockServer(
+		// RunMockServer.class.getResource("/echo.yaml").getFile(), 8080);
 
-        new SwaggerMockServer(SwaggerConfig.create().setSwaggerResourceName("/echo.yaml"), 8080);
-    }
+		new SwaggerMockServer(SwaggerConfig.create().setSwaggerResourceName(
+				"/echo.yaml"), 8080);
+	}
 }

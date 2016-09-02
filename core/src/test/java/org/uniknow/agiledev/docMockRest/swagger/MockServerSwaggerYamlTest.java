@@ -1,17 +1,17 @@
 /**
  * Copyright (C) 2016 UniKnow (info.uniknow@gmail.com)
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
+ * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.uniknow.agiledev.docMockRest.swagger;
 
@@ -49,11 +49,8 @@ public class MockServerSwaggerYamlTest {
     public static void init() {
 
         try {
-            server = new SwaggerMockServer(
-                    SwaggerConfig
-                            .create()
-                            .setSwaggerResourceName("/echo.yaml"),
-                    8080);
+            server = new SwaggerMockServer(SwaggerConfig.create()
+                .setSwaggerResourceName("/echo.yaml"), 8080);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -74,7 +71,7 @@ public class MockServerSwaggerYamlTest {
      */
     @Test
     public void testInvokeStubbedOperationWithNoResponseDefined()
-            throws IOException {
+        throws IOException {
         HttpClient client = new DefaultHttpClient();
         HttpGet request;
         HttpResponse response;
@@ -83,19 +80,16 @@ public class MockServerSwaggerYamlTest {
         request = new HttpGet("http://localhost:8080/echo?message=test");
         response = client.execute(request);
         assertEquals(HttpStatus.SC_NOT_IMPLEMENTED, response.getStatusLine()
-                .getStatusCode());
+            .getStatusCode());
         EntityUtils.consumeQuietly(response.getEntity());
 
         // Check proper response is returned for operation with query parameters
-        request = new HttpGet(
-                "http://localhost:8080/echo?message=test");
+        request = new HttpGet("http://localhost:8080/echo?message=test");
         response = client.execute(request);
         assertEquals(HttpStatus.SC_NOT_IMPLEMENTED, response.getStatusLine()
-                .getStatusCode());
+            .getStatusCode());
         EntityUtils.consumeQuietly(response.getEntity());
     }
-
-
 
     /**
      * Verifies Operation for mocked stub can be retrieved successfully
@@ -103,8 +97,8 @@ public class MockServerSwaggerYamlTest {
     @Test
     public void testGetOperationByStub() {
         Operation operation = server.getOperation(new RequestPatternBuilder(
-                RequestMethod.GET, UrlPattern.fromOneOf("/echo?message=test", null, null,
-                null)).build());
+            RequestMethod.GET, UrlPattern.fromOneOf("/echo?message=test", null,
+                null, null)).build());
         assertNotNull(operation);
     }
 
@@ -122,14 +116,8 @@ public class MockServerSwaggerYamlTest {
     @Test
     public void testGetNonExistingOperation() {
         assertNull(server.getOperation(new RequestPatternBuilder(
-                RequestMethod.GET, UrlPattern.fromOneOf("/nonexisting/operation",
+            RequestMethod.GET, UrlPattern.fromOneOf("/nonexisting/operation",
                 null, null, null)).build()));
     }
-
-
-
-
-
-
 
 }

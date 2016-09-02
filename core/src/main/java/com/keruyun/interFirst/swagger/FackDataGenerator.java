@@ -27,7 +27,7 @@ import java.io.InputStream;
  * Created by nielinjie on 8/29/16.
  */
 public class FackDataGenerator {
-    // public JsonNode generate(Schema schema) {
-    //
-    // }
+	// public JsonNode generate(Schema schema) {
+	//
+	// }
 }

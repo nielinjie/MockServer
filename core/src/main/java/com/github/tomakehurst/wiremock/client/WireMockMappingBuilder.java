@@ -26,16 +26,16 @@ import com.github.tomakehurst.wiremock.matching.UrlPattern;
  */
 public class WireMockMappingBuilder extends MappingBuilder {
 
-    public WireMockMappingBuilder(RequestMethod method, UrlPattern urlPattern) {
-        super(method, urlPattern);
-    }
+	public WireMockMappingBuilder(RequestMethod method, UrlPattern urlPattern) {
+		super(method, urlPattern);
+	}
 
-    public WireMockMappingBuilder(RequestMatcher requestMatcher) {
-        super(requestMatcher);
-    }
+	public WireMockMappingBuilder(RequestMatcher requestMatcher) {
+		super(requestMatcher);
+	}
 
-    public WireMockMappingBuilder(String customRequestMatcherName,
-        Parameters parameters) {
-        super(customRequestMatcherName, parameters);
-    }
+	public WireMockMappingBuilder(String customRequestMatcherName,
+			Parameters parameters) {
+		super(customRequestMatcherName, parameters);
+	}
 }

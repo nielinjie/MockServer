@@ -545,37 +545,7 @@
 
         <plugins>
 
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>2.11</version>
-                <configuration>
-                    <strictCheck>true</strictCheck>
-                    <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
-                    <properties>
-                        <owner>UniKnow</owner>
-                        <email>info.uniknow@gmail.com</email>
-                        <project.inceptionYear>2016</project.inceptionYear>
-                    </properties>
 
-                    <excludes>
-                        <exclude>**/*.iml</exclude>
-                        <exclude>target/**</exclude>
-                        <exclude>.idea/**</exclude>
-                        <exclude>src/test/resources/**</exclude>
-                        <exclude>src/main/resources/**</exclude>
-                    </excludes>
-
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                        <phase>process-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
 
 
             <plugin>
@@ -620,82 +590,9 @@
             </plugin>
 
 
-            <!-- START: plugins site documentation -->
-            <plugin>
-                <groupId>de.saumya.mojo</groupId>
-                <artifactId>gem-maven-plugin</artifactId>
-                <version>1.0.10</version>
-                <configuration>
-                    <!-- align JRuby version with AsciidoctorJ to avoid redundant downloading -->
-                    <jrubyVersion>1.7.9</jrubyVersion>
-                    <gemHome>${project.build.directory}/gems</gemHome>
-                    <gemPath>${project.build.directory}/gems</gemPath>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>initialize</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 
-            <plugin>
-                <artifactId>maven-site-plugin</artifactId>
-                <version>3.4</version>
-                <configuration>
-                    <outputDirectory>${siteOutputDirectory}</outputDirectory>
-                    <asciidoc>
-                        <attributes>
-                            <site-url>${site.url}</site-url>
-                            <project-name>${project.name}</project-name>
-                            <issue-management>${issueManagement.url}</issue-management>
-                            <imagesdir>${project.basedir}/src/site/resources/images</imagesdir>
-                        </attributes>
-                    </asciidoc>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.asciidoctor</groupId>
-                        <artifactId>asciidoctor-maven-plugin</artifactId>
-                        <version>${asciidoctor.maven.plugin.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.asciidoctor</groupId>
-                        <artifactId>asciidoctorj-diagram</artifactId>
-                        <version>${asciidoctorj.diagram}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.asciidoctor</groupId>
-                        <artifactId>asciidoctorj</artifactId>
-                        <version>${asciidoctorj.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.jruby</groupId>
-                        <artifactId>jruby-complete</artifactId>
-                        <version>${jruby.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-scm-publish-plugin</artifactId>
-                <version>1.1</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
-                    <checkinComment>Publishing Site Docs for ${project.artifactId}:${project.version}</checkinComment>
 
-                    <!-- Plugins defaults to "target/staging" and since the distributionManagement section is a pain in the ass for site docs, this is easier -->
-                    <content>${scm-publish.siteDocOuputDirectory}</content>
-                    <skipDeletedFiles>true</skipDeletedFiles>
-                    <pubScmUrl>${scm-publish.pubScmUrl}</pubScmUrl>
-                    <scmBranch>${scm-publish.scmBranch}</scmBranch>
-
-                </configuration>
-            </plugin>
             <!-- END: plugins site documentation -->
         </plugins>
     </build>

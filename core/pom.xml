@@ -159,11 +159,7 @@
         </dependency>
         <!-- END: Dependencies for Swagger -->
 
-        <!-- Dependency for JSON Schema validation -->
-        <dependency>
-            <groupId>org.everit.json</groupId>
-            <artifactId>org.everit.json.schema</artifactId>
-        </dependency>
+
 
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>

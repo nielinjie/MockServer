@@ -15,13 +15,6 @@
  */
 package com.keruyun.interFirst.swagger;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.tomakehurst.wiremock.standalone.MappingsLoader;
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
-import com.github.tomakehurst.wiremock.stubbing.StubMappings;
-import org.everit.json.schema.Schema;
-
-import java.io.InputStream;
 
 /**
  * Created by nielinjie on 8/29/16.

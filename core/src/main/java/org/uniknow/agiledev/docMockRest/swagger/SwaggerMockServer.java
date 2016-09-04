@@ -146,6 +146,7 @@ public class SwaggerMockServer {
     // 需要用于json格式的response文件来配对。
     // 但json格式的response文件是谁定义的？wiremock定义的？
     // 可以重新定义？可以不管，抛弃response文件？
+    // 这块由他去吧。
     public Operation getOperation(@NotNull RequestPattern request) {
 
         String requestUrl = request.getUrl() == null ? request.getUrlPattern()
